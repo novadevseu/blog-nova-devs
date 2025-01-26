@@ -19,3 +19,116 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/*Aquí definimos el estilo de la clase .markdown-content que se aplicará a los elementos de Markdown en nuestra aplicación.*/
+
+.markdown-content {
+  font-family: Arial, sans-serif; /* Fuente limpia y legible */
+  line-height: 1.6; /* Espaciado entre líneas para mejor lectura */
+  color: #333; /* Color de texto */
+  padding: 1rem; /* Espaciado interno */
+  background-color: #fff; /* Fondo blanco */
+  border-radius: 8px; /* Bordes redondeados */
+  
+  max-width: 800px; /* Ancho máximo */
+  margin: 0 auto; /* Centrado */
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.markdown-content h1 {
+  font-size: 2rem;
+  color: #1a73e8; /* Color azul para el encabezado principal */
+  border-bottom: 2px solid #eaeaea; /* Línea debajo del título */
+  padding-bottom: 0.5rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.75rem;
+  color: #333;
+}
+
+.markdown-content h3 {
+  font-size: 1.5rem;
+  color: #555;
+}
+
+.markdown-content p {
+  margin-bottom: 1rem;
+}
+
+.markdown-content a {
+  color: #1a73e8; /* Color de enlace */
+  text-decoration: none;
+}
+
+.markdown-content a:hover {
+  text-decoration: underline; /* Subrayado al pasar el mouse */
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+.markdown-content ul li {
+  list-style-type: disc;
+}
+
+.markdown-content ol li {
+  list-style-type: decimal;
+}
+
+.markdown-content blockquote {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 4px solid #eaeaea;
+  color: #666;
+  font-style: italic;
+}
+
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px; /* Bordes redondeados en imágenes */
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid #eaeaea;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.markdown-content th {
+  background-color: #f7f7f7;
+  font-weight: bold;
+}
+
+.markdown-content code {
+  background-color: #f3f3f3;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.markdown-content pre {
+  background-color: #f3f3f3;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Courier New', Courier, monospace;
+}
