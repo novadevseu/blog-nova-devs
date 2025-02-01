@@ -23,7 +23,7 @@ const SignUpPage: React.FC = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Crear el registro en Firestore
+      // Create the record in Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         email: user.email,
@@ -31,12 +31,12 @@ const SignUpPage: React.FC = () => {
         createdAt: new Date(),
       });
 
-      alert("Registro exitoso.");
+      alert("Registration successful.");
       router.push("/profile");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error("Error registrando usuario:", error);
-      setError(error.message || "Error desconocido.");
+      console.error("Error registering user:", error);
+      setError(error.message || "Unknown error.");
     } finally {
       setLoading(false);
     }
@@ -51,12 +51,12 @@ const SignUpPage: React.FC = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Verificar si el usuario ya existe en Firestore
+      // Check if the user already exists in Firestore
       const userDocRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
 
       if (!userDoc.exists()) {
-        // Si no existe, crear un nuevo registro
+        // If not, create a new record
         await setDoc(userDocRef, {
           uid: user.uid,
           email: user.email,
@@ -65,12 +65,12 @@ const SignUpPage: React.FC = () => {
         });
       }
 
-      alert("Inicio de sesión exitoso.");
+      alert("Login successful.");
       router.push("/profile");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error("Error durante la autenticación con Google:", error);
-      setError(error.message || "Error desconocido.");
+      console.error("Error during Google authentication:", error);
+      setError(error.message || "Unknown error.");
     } finally {
       setLoading(false);
     }
@@ -87,14 +87,14 @@ const SignUpPage: React.FC = () => {
       <div className="flex flex-1 items-center justify-center bg-gray-100">
         <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-2xl font-semibold text-center mb-4">
-            Regístrate
+            Sign Up
           </h2>
 
-          {/* Formulario de registro con email */}
+          {/* Email Sign-Up Form */}
           <form onSubmit={handleEmailSignUp} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Correo Electrónico
+                Email
               </label>
               <input
                 type="email"
@@ -107,7 +107,7 @@ const SignUpPage: React.FC = () => {
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Contraseña
+                Password
               </label>
               <input
                 type="password"
@@ -127,13 +127,13 @@ const SignUpPage: React.FC = () => {
                   : "bg-indigo-600 hover:bg-indigo-700 text-white"
               }`}
             >
-              {loading ? "Registrando..." : "Registrarse"}
+              {loading ? "Registering..." : "Sign Up"}
             </button>
           </form>
 
           <hr className="my-6" />
 
-          {/* Botón de Google Sign-In */}
+          {/* Google Sign-In Button */}
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
@@ -143,7 +143,7 @@ const SignUpPage: React.FC = () => {
                 : "bg-red-600 hover:bg-red-700 text-white"
             }`}
           >
-            {loading ? "Cargando..." : "Continuar con Google"}
+            {loading ? "Loading..." : "Continue with Google"}
           </button>
 
           {error && (

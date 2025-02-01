@@ -34,7 +34,7 @@ interface Comment {
 
 const PostPage = () => {
   const params = useParams();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id; // Asegurar que id es un string
+  const id = Array.isArray(params.id) ? params.id[0] : params.id; // Ensure id is a string
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -48,7 +48,7 @@ const PostPage = () => {
   useEffect(() => {
     const fetchPost = async () => {
       if (!id) {
-        setError("No se proporcionó un ID válido.");
+        setError("No valid ID provided.");
         setLoading(false);
         return;
       }
@@ -60,11 +60,11 @@ const PostPage = () => {
         if (postDoc.exists()) {
           setPost(postDoc.data() as Post);
         } else {
-          setError("El post no existe.");
+          setError("The post does not exist.");
         }
       } catch (err) {
-        console.error("Error al obtener el post:", err);
-        setError("Hubo un error al cargar el post.");
+        console.error("Error fetching post:", err);
+        setError("There was an error loading the post.");
       } finally {
         setLoading(false);
       }
@@ -99,7 +99,7 @@ const PostPage = () => {
               setUserEmail(currentUser.email);
             }
           } catch (err) {
-            console.error("Error al cargar el rol del usuario:", err);
+            console.error("Error loading user role:", err);
           }
         }
       });
@@ -125,16 +125,16 @@ const PostPage = () => {
       });
       setNewComment("");
     } catch (err) {
-      console.error("Error al agregar el comentario:", err);
+      console.error("Error adding comment:", err);
     }
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    if (confirm("¿Estás seguro de que deseas eliminar este comentario?")) {
+    if (confirm("Are you sure you want to delete this comment?")) {
       try {
         await deleteDoc(doc(db, "comments", commentId));
       } catch (err) {
-        console.error("Error al eliminar el comentario:", err);
+        console.error("Error deleting comment:", err);
       }
     }
   };
@@ -146,7 +146,7 @@ const PostPage = () => {
           <Navbar />
         </header>
         <div className="flex items-center justify-center flex-1">
-          Cargando...
+          Loading...
         </div>
       </div>
     );
@@ -165,79 +165,79 @@ const PostPage = () => {
     );
   }
 
-  return (<div className="flex flex-col min-h-screen">
-    <header>
-      <Navbar />
-    </header>
-    <div className="flex items-center justify-center flex-1 bg-gray-100 p-6">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl">
-        <h1 className="text-3xl font-bold mb-4">{post?.title}</h1>
-  
-        {/* Botón de editar */}
-        {userRole === "Admin" && (
-          <div className="mb-6 flex justify-end">
-            <button
-              onClick={() => router.push(`/update/${id}`)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Editar Post
-            </button>
-          </div>
-        )}
-  
-        <div className="markdown-content mb-6">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {post?.content || ""}
-          </ReactMarkdown>
-        </div>
-        <p className="text-sm text-gray-500 mb-6">
-          Publicado el: {new Date((post?.timestamp?.seconds ?? 0) * 1000).toLocaleString()}
-        </p>
-  
-        {/* Sección de comentarios */}
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-4">Comentarios</h2>
-  
-          {userEmail && (
-            <form onSubmit={handleAddComment} className="mb-6">
-              <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Escribe tu comentario..."
-                className="w-full p-3 border border-gray-300 rounded-md mb-2"
-                rows={3}
-              ></textarea>
+  return (
+    <div className="flex flex-col min-h-screen">
+      <header>
+        <Navbar />
+      </header>
+      <div className="flex items-center justify-center flex-1 bg-gray-100 p-6">
+        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl">
+          <h1 className="text-3xl font-bold mb-4">{post?.title}</h1>
+
+          {/* Edit button */}
+          {userRole === "Admin" && (
+            <div className="mb-6 flex justify-end">
               <button
-                type="submit"
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700"
+                onClick={() => router.push(`/update/${id}`)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Comentar
+                Edit Post
               </button>
-            </form>
-          )}
-  
-          {comments.map((comment) => (
-            <div key={comment.id} className="border-b border-gray-200 pb-4 mb-4">
-              <p className="text-sm font-medium">{comment.email}</p>
-              <p className="text-gray-700">{comment.content}</p>
-              <p className="text-xs text-gray-500">
-                {new Date(comment.timestamp.seconds * 1000).toLocaleString()}
-              </p>
-              {userRole === "Admin" && (
-                <button
-                  onClick={() => handleDeleteComment(comment.id)}
-                  className="text-red-500 text-sm mt-2"
-                >
-                  Eliminar
-                </button>
-              )}
             </div>
-          ))}
+          )}
+
+          <div className="markdown-content mb-6">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {post?.content || ""}
+            </ReactMarkdown>
+          </div>
+          <p className="text-sm text-gray-500 mb-6">
+            Published on: {new Date((post?.timestamp?.seconds ?? 0) * 1000).toLocaleString()}
+          </p>
+
+          {/* Comments section */}
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold mb-4">Comments</h2>
+
+            {userEmail && (
+              <form onSubmit={handleAddComment} className="mb-6">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Write your comment..."
+                  className="w-full p-3 border border-gray-300 rounded-md mb-2"
+                  rows={3}
+                ></textarea>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700"
+                >
+                  Comment
+                </button>
+              </form>
+            )}
+
+            {comments.map((comment) => (
+              <div key={comment.id} className="border-b border-gray-200 pb-4 mb-4">
+                <p className="text-sm font-medium">{comment.email}</p>
+                <p className="text-gray-700">{comment.content}</p>
+                <p className="text-xs text-gray-500">
+                  {new Date(comment.timestamp.seconds * 1000).toLocaleString()}
+                </p>
+                {userRole === "Admin" && (
+                  <button
+                    onClick={() => handleDeleteComment(comment.id)}
+                    className="text-red-500 text-sm mt-2"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  
   );
 };
 

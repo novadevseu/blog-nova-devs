@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link"; // Para navegar entre rutas en Next.js
+import Link from "next/link"; // For navigating between routes in Next.js
 
 const Navbar: React.FC = () => {
   return (
@@ -10,23 +10,23 @@ const Navbar: React.FC = () => {
         {/* Logo */}
         <div className="text-xl font-bold">
           <Link href="/">
-            Mi App
+            My App
           </Link>
         </div>
 
         {/* Links */}
         <div className="space-x-4">
           <Link href="/">
-            Inicio
+            Home
           </Link>
           <Link href="/profile">
-            Perfil
+            Profile
           </Link>
           <Link href="/signup">
-            Registrarse
+            Sign Up
           </Link>
           <Link href="/login">
-          Iniciar Sesión
+            Log In
           </Link>
         </div>
       </div>

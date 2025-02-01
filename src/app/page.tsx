@@ -6,7 +6,7 @@ import { collection, getDocs, query, orderBy, limit, startAfter, DocumentData } 
 import { db } from "./config/firebase-config";
 import Navbar from "./components/Navbar";
 
-// Define la interfaz para un post
+// Define the interface for a post
 interface Post {
   id: string;
   title: string;
@@ -47,7 +47,7 @@ export default function Home() {
       setHasMore(snapshot.docs.length === POSTS_PER_PAGE);
     } catch (err) {
       console.error("Error fetching posts:", err);
-      setError("Hubo un error al cargar los posts. Intenta de nuevo más tarde.");
+      setError("There was an error loading the posts. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -69,14 +69,14 @@ export default function Home() {
         <h2 className="text-2xl font-semibold text-center mb-8">Firestore Posts</h2>
 
         {/* Loading State */}
-        {loading && <p className="text-center text-gray-500">Cargando posts...</p>}
+        {loading && <p className="text-center text-gray-500">Loading posts...</p>}
 
         {/* Error State */}
         {error && <p className="text-center text-red-500">{error}</p>}
 
         {/* No Posts Found */}
         {!loading && posts.length === 0 && !error && (
-          <p className="text-center text-gray-500">No se encontraron posts.</p>
+          <p className="text-center text-gray-500">No posts found.</p>
         )}
 
         {/* Posts List */}
@@ -103,13 +103,11 @@ export default function Home() {
               onClick={() => fetchPosts()}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
             >
-              Cargar más
+              Load more
             </button>
           </div>
         )}
       </main>
-
-      
     </div>
   );
 }

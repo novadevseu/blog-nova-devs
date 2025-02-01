@@ -8,7 +8,7 @@ import { auth, db } from "../../config/firebase-config";
 import Navbar from "../../components/Navbar";
 import dynamic from "next/dynamic";
 
-// Cargar el editor dinámicamente para evitar problemas con SSR
+// Load the editor dynamically to avoid SSR issues
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
 interface Post {
@@ -20,7 +20,7 @@ interface Post {
 
 const UpdatePostPage: React.FC = () => {
   const params = useParams();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id; // Asegurar que el id es un string
+  const id = Array.isArray(params.id) ? params.id[0] : params.id; // Ensure id is a string
   const router = useRouter();
 
   const [user, setUser] = useState<null | { email: string; role: string }>(null);
@@ -47,17 +47,17 @@ const UpdatePostPage: React.FC = () => {
                 role: userData.role as string,
               });
             } else {
-              router.push("/"); // Redirigir si el usuario no es Admin
+              router.push("/"); // Redirect if the user is not Admin
             }
           } else {
-            router.push("/login"); // Redirigir si no se encuentra el usuario
+            router.push("/login"); // Redirect if the user is not found
           }
         } catch (error) {
-          console.error("Error al cargar los datos del usuario:", error);
-          router.push("/login"); // Redirigir en caso de error
+          console.error("Error loading user data:", error);
+          router.push("/login"); // Redirect in case of error
         }
       } else {
-        router.push("/login"); // Redirigir si no está autenticado
+        router.push("/login"); // Redirect if not authenticated
       }
       setLoading(false);
     });
@@ -73,7 +73,7 @@ const UpdatePostPage: React.FC = () => {
       }
 
       try {
-        const postRef = doc(db, "posts", id); // Usar el ID validado aquí
+        const postRef = doc(db, "posts", id); // Use the validated ID here
         const postDoc = await getDoc(postRef);
 
         if (postDoc.exists()) {
@@ -83,10 +83,10 @@ const UpdatePostPage: React.FC = () => {
           setShortDescription(postData.shortDescription);
           setContent(postData.content);
         } else {
-          router.push("/404"); // Redirigir si el post no existe
+          router.push("/404"); // Redirect if the post does not exist
         }
       } catch (err) {
-        console.error("Error al cargar el post:", err);
+        console.error("Error loading post:", err);
         router.push("/404");
       }
     };
@@ -100,12 +100,12 @@ const UpdatePostPage: React.FC = () => {
     e.preventDefault();
 
     if (!id) {
-      console.error("El ID del post es inválido.");
+      console.error("Invalid post ID.");
       return;
     }
 
     try {
-      const postRef = doc(db, "posts", id); // Usar el ID validado aquí
+      const postRef = doc(db, "posts", id); // Use the validated ID here
       await updateDoc(postRef, {
         title,
         shortDescription,
@@ -113,34 +113,34 @@ const UpdatePostPage: React.FC = () => {
         timestamp: new Date(),
       });
 
-      setSuccessMessage("¡Post actualizado con éxito!");
-      setTimeout(() => setSuccessMessage(""), 3000); // Ocultar el mensaje después de 3 segundos
+      setSuccessMessage("Post updated successfully!");
+      setTimeout(() => setSuccessMessage(""), 3000); // Hide the message after 3 seconds
       router.push(`/posts/${id}`);
     } catch (err) {
-      console.error("Error al actualizar el post:", err);
+      console.error("Error updating post:", err);
     }
   };
 
   const handleDeletePost = async () => {
     if (!id) {
-      console.error("El ID del post es inválido.");
+      console.error("Invalid post ID.");
       return;
     }
 
     try {
-      const postRef = doc(db, "posts", id); // Usar el ID validado aquí
+      const postRef = doc(db, "posts", id); // Use the validated ID here
       await deleteDoc(postRef);
 
-      router.push("/"); // Redirigir a la página principal tras eliminar
+      router.push("/"); // Redirect to the main page after deletion
     } catch (err) {
-      console.error("Error al eliminar el post:", err);
+      console.error("Error deleting post:", err);
     }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Cargando...</p>
+        <p>Loading...</p>
       </div>
     );
   }
@@ -148,7 +148,7 @@ const UpdatePostPage: React.FC = () => {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <p className="mb-4 text-gray-700">No estás autenticado o no tienes permiso.</p>
+        <p className="mb-4 text-gray-700">You are not authenticated or do not have permission.</p>
       </div>
     );
   }
@@ -163,12 +163,12 @@ const UpdatePostPage: React.FC = () => {
       {/* Main Content */}
       <div className="flex flex-1 items-center justify-center bg-gray-100">
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
-          <h2 className="text-xl font-semibold text-center mb-4">Editar Post</h2>
+          <h2 className="text-xl font-semibold text-center mb-4">Edit Post</h2>
 
           <form onSubmit={handleUpdatePost} className="space-y-4">
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                Título
+                Title
               </label>
               <input
                 type="text"
@@ -181,7 +181,7 @@ const UpdatePostPage: React.FC = () => {
             </div>
             <div>
               <label htmlFor="shortDescription" className="block text-sm font-medium text-gray-700">
-                Descripción Corta
+                Short Description
               </label>
               <input
                 type="text"
@@ -194,7 +194,7 @@ const UpdatePostPage: React.FC = () => {
             </div>
             <div>
               <label htmlFor="content" className="block text-sm font-medium text-gray-700">
-                Contenido
+                Content
               </label>
               <MDEditor value={content} onChange={setContent} height={500} />
             </div>
@@ -202,7 +202,7 @@ const UpdatePostPage: React.FC = () => {
               type="submit"
               className="w-full py-2 px-4 bg-indigo-600 text-white font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Guardar Cambios
+              Save Changes
             </button>
           </form>
 
@@ -214,7 +214,7 @@ const UpdatePostPage: React.FC = () => {
             onClick={handleDeletePost}
             className="mt-6 w-full py-2 px-4 bg-red-600 text-white font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           >
-            Eliminar Post
+            Delete Post
           </button>
         </div>
       </div>

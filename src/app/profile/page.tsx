@@ -8,15 +8,15 @@ import { auth, db } from "../config/firebase-config";
 import Navbar from "../components/Navbar";
 import dynamic from "next/dynamic";
 
-// Cargar el editor dinámicamente para evitar problemas con SSR
+// Load the editor dynamically to avoid SSR issues
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
 const Profile: React.FC = () => {
   const [user, setUser] = useState<null | { email: string; role: string }>(null);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
-  const [shortDescription, setShortDescription] = useState(""); // Nuevo campo
-  const [content, setContent] = useState<string | undefined>(""); // Ajustar para MDEditor
+  const [shortDescription, setShortDescription] = useState(""); // New field
+  const [content, setContent] = useState<string | undefined>(""); // Adjust for MDEditor
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
 
@@ -37,12 +37,11 @@ const Profile: React.FC = () => {
             setUser(null);
           }
         } catch (error) {
-          console.error("Error al cargar los datos del usuario:", error);
+          console.error("Error loading user data:", error);
           setUser(null);
         }
       } else {
         setUser(null);
-       
       }
       setLoading(false);
     });
@@ -65,10 +64,10 @@ const Profile: React.FC = () => {
       setTitle("");
       setShortDescription("");
       setContent("");
-      setSuccessMessage("¡Post creado con éxito!");
+      setSuccessMessage("Post created successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
-      console.error("Error al crear el post:", error);
+      console.error("Error creating post:", error);
     }
   };
 
@@ -80,28 +79,28 @@ const Profile: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Cargando...</p>
+        <p>Loading...</p>
       </div>
     );
   }
 
   if (!user) {
     return (
-        <div className="flex flex-col min-h-screen">
-      {/* Navbar */}
-      <header>
-        <Navbar />
-      </header>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        
-        <p className="mb-4 text-gray-700">No estás autenticado.</p>
-        <button
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-          onClick={() => router.push("/login")}
-        >
-          Iniciar sesión
-        </button>
-      </div> </div>
+      <div className="flex flex-col min-h-screen">
+        {/* Navbar */}
+        <header>
+          <Navbar />
+        </header>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+          <p className="mb-4 text-gray-700">You are not authenticated.</p>
+          <button
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            onClick={() => router.push("/login")}
+          >
+            Log In
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -115,24 +114,24 @@ const Profile: React.FC = () => {
       {/* Main Content */}
       <div className="flex flex-1 items-center justify-center bg-gray-100">
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
-          <h2 className="text-xl font-semibold text-center mb-4">Perfil</h2>
+          <h2 className="text-xl font-semibold text-center mb-4">Profile</h2>
           <div className="text-center mb-6">
             <p className="text-sm text-gray-700">
-              <strong>Correo:</strong> {user.email}
+              <strong>Email:</strong> {user.email}
             </p>
             <p className="text-sm text-gray-700">
-              <strong>Rol:</strong> {user.role}
+              <strong>Role:</strong> {user.role}
             </p>
           </div>
 
-          {/* Mostrar formulario si el rol es Admin */}
+          {/* Show form if role is Admin */}
           {user.role === "Admin" && (
             <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Crear Post</h3>
+              <h3 className="text-lg font-semibold mb-2">Create Post</h3>
               <form onSubmit={handleCreatePost} className="space-y-4">
                 <div>
                   <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                    Título
+                    Title
                   </label>
                   <input
                     type="text"
@@ -145,7 +144,7 @@ const Profile: React.FC = () => {
                 </div>
                 <div>
                   <label htmlFor="shortDescription" className="block text-sm font-medium text-gray-700">
-                    Descripción Corta
+                    Short Description
                   </label>
                   <input
                     type="text"
@@ -158,7 +157,7 @@ const Profile: React.FC = () => {
                 </div>
                 <div>
                   <label htmlFor="content" className="block text-sm font-medium text-gray-700">
-                    Contenido
+                    Content
                   </label>
                   <MDEditor value={content} onChange={setContent} height={500} />
                 </div>
@@ -166,7 +165,7 @@ const Profile: React.FC = () => {
                   type="submit"
                   className="w-full py-2 px-4 bg-indigo-600 text-white font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  Crear Post
+                  Create Post
                 </button>
               </form>
               {successMessage && (
@@ -179,7 +178,7 @@ const Profile: React.FC = () => {
             onClick={handleLogout}
             className="mt-6 w-full py-2 px-4 bg-red-600 text-white font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
           >
-            Cerrar sesión
+            Log Out
           </button>
         </div>
       </div>

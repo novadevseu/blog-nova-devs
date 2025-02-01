@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // Importar el router
+import { useRouter } from "next/navigation"; // Import the router
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../config/firebase-config";
-import Navbar from "../components/Navbar"; // Importar el Navbar
+import Navbar from "../components/Navbar"; // Import the Navbar
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -13,9 +13,9 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const router = useRouter(); // Inicializar el router
+  const router = useRouter(); // Initialize the router
 
-  // Manejar inicio de sesión con correo y contraseña
+  // Handle login with email and password
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -25,14 +25,14 @@ const LoginPage: React.FC = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Acceder directamente al documento del usuario usando su UID
+      // Directly access the user's document using their UID
       const userDocRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {
         router.push("/profile");
       } else {
-        throw new Error("No se encontró información del usuario en Firestore.");
+        throw new Error("User information not found in Firestore.");
       }
 
       setEmail("");
@@ -40,18 +40,18 @@ const LoginPage: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.code === "auth/user-not-found") {
-        setError("El usuario no existe.");
+        setError("User does not exist.");
       } else if (error.code === "auth/wrong-password") {
-        setError("Contraseña incorrecta.");
+        setError("Incorrect password.");
       } else {
-        setError(error.message || "Error desconocido.");
+        setError(error.message || "Unknown error.");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Manejar inicio de sesión con Google
+  // Handle login with Google
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError("");
@@ -65,7 +65,7 @@ const LoginPage: React.FC = () => {
       const userDoc = await getDoc(userDocRef);
 
       if (!userDoc.exists()) {
-        // Crear documento si el usuario no existe en Firestore
+        // Create document if the user does not exist in Firestore
         await setDoc(userDocRef, {
           uid: user.uid,
           email: user.email,
@@ -77,8 +77,8 @@ const LoginPage: React.FC = () => {
       router.push("/profile");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error("Error durante Google Sign-In:", error);
-      setError(error.message || "Error desconocido.");
+      console.error("Error during Google Sign-In:", error);
+      setError(error.message || "Unknown error.");
     } finally {
       setLoading(false);
     }
@@ -94,11 +94,11 @@ const LoginPage: React.FC = () => {
       {/* Main Content */}
       <div className="flex items-center justify-center flex-1 bg-gray-100">
         <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-semibold text-center mb-4">Inicia sesión</h2>
+          <h2 className="text-2xl font-semibold text-center mb-4">Log In</h2>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Correo Electrónico
+                Email
               </label>
               <input
                 type="email"
@@ -111,7 +111,7 @@ const LoginPage: React.FC = () => {
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Contraseña
+                Password
               </label>
               <input
                 type="password"
@@ -136,7 +136,7 @@ const LoginPage: React.FC = () => {
                   : "bg-indigo-600 hover:bg-indigo-700 text-white"
               }`}
             >
-              {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+              {loading ? "Logging in..." : "Log In"}
             </button>
           </form>
           <hr className="my-6" />
@@ -149,7 +149,7 @@ const LoginPage: React.FC = () => {
                 : "bg-red-600 hover:bg-red-700 text-white"
             }`}
           >
-            {loading ? "Cargando..." : "Iniciar sesión con Google"}
+            {loading ? "Loading..." : "Log in with Google"}
           </button>
         </div>
       </div>
