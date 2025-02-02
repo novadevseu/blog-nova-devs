@@ -21,7 +21,7 @@ yarn install
 pnpm install
 ```
 
-Create a `.env.local` file in the root of the project and add the following environment variables:
+Create a `.env` file in the root of the project and add the following environment variables:
 
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
