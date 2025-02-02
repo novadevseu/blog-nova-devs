@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { collection, getDocs, query, orderBy, limit, startAfter, DocumentData } from "firebase/firestore";
-import { db } from "./config/firebase-config";
-import Navbar from "./components/Navbar";
+import { db } from "../config/firebase-config";
+import Navbar from "../components/Navbar";
 
 // Define the interface for a post
 interface Post {

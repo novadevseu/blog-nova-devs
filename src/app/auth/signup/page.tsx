@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db } from "../config/firebase-config";
-import Navbar from "../components/Navbar";
+import { auth, db } from "../../../config/firebase-config";
+import Navbar from "../../../components/Navbar";
 
 const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState("");

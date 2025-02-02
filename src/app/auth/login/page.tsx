@@ -4,8 +4,12 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation"; // Import the router
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db } from "../config/firebase-config";
-import Navbar from "../components/Navbar"; // Import the Navbar
+import { auth, db } from "../../../config/firebase-config";
+import Navbar from "../../../components/Navbar"; // Import the Navbar
+
+// redux and redux functions
+import { useDispatch } from "react-redux";
+import { login } from "@/redux/slices/userSlice"; 
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -29,8 +33,10 @@ const LoginPage: React.FC = () => {
       const userDocRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
 
+      console.log(userDoc.data())
+
       if (userDoc.exists()) {
-        router.push("/profile");
+        /* router.push("/profile"); */
       } else {
         throw new Error("User information not found in Firestore.");
       }

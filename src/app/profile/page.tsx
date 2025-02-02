@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, doc, getDoc, addDoc } from "firebase/firestore";
-import { auth, db } from "../config/firebase-config";
-import Navbar from "../components/Navbar";
+import { auth, db } from "../../config/firebase-config";
+import Navbar from "../../components/Navbar";
 import dynamic from "next/dynamic";
 
 // Load the editor dynamically to avoid SSR issues

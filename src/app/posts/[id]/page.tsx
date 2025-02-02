@@ -13,8 +13,8 @@ import {
   deleteDoc,
   onSnapshot,
 } from "firebase/firestore";
-import { db, auth } from "../../config/firebase-config";
-import Navbar from "../../components/Navbar";
+import { db, auth } from "../../../config/firebase-config";
+import Navbar from "../../../components/Navbar";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { onAuthStateChanged } from "firebase/auth";

@@ -22,10 +22,10 @@ const Navbar: React.FC = () => {
           <Link href="/profile">
             Profile
           </Link>
-          <Link href="/signup">
+          <Link href="/auth/signup">
             Sign Up
           </Link>
-          <Link href="/login">
+          <Link href="/auth/login">
             Log In
           </Link>
         </div>
