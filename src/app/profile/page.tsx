@@ -21,6 +21,8 @@ const Profile: React.FC = () => {
   const [title, setTitle] = useState("");
   const [shortDescription, setShortDescription] = useState(""); // New field
   const [content, setContent] = useState<string | undefined>(""); // Adjust for MDEditor
+  const [thumbnailUrl, setThumbnailUrl] = useState(""); // New field
+  const [categories, setCategories] = useState<string[]>([]); // New field
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
 
@@ -59,24 +61,37 @@ const Profile: React.FC = () => {
 
   const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !shortDescription || !content) return;
+    if (!title || !shortDescription || !content || !thumbnailUrl || categories.length === 0) return;
 
     try {
       await addDoc(collection(db, "posts"), {
         title,
         shortDescription,
         content,
+        thumbnailUrl, // Include thumbnail URL
+        categories, // Include categories
+        author: user?.email, // Include author
         timestamp: new Date(),
       });
 
       setTitle("");
       setShortDescription("");
       setContent("");
+      setThumbnailUrl(""); // Reset thumbnail URL
+      setCategories([]); // Reset categories
       setSuccessMessage("Post created successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error("Error creating post:", error);
     }
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setCategories((prevCategories) =>
+      prevCategories?.includes(category)
+        ? prevCategories.filter((cat) => cat !== category)
+        : [...prevCategories, category]
+    );
   };
 
   const handleLogout = async () => {
@@ -120,14 +135,14 @@ const Profile: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <div className="flex flex-1 items-center justify-center bg-gray-100">
-        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
+      <div className="flex flex-1 items-center justify-center ">
+        <div className=" p-6 rounded-lg w-full max-w-4xl">
           <h2 className="text-xl font-semibold text-center mb-4">Profile</h2>
           <div className="text-center mb-6">
-            <p className="text-sm text-gray-700">
+            <p className="text-sm ">
               <strong>Email:</strong> {user.email}
             </p>
-            <p className="text-sm text-gray-700">
+            <p className="text-sm ">
               <strong>Role:</strong> {user.role}
             </p>
           </div>
@@ -147,11 +162,12 @@ const Profile: React.FC = () => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
+                    style={{ color: 'black' }}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
                 <div>
-                  <label htmlFor="shortDescription" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="shortDescription" className="block text-sm font-medium ">
                     Short Description
                   </label>
                   <input
@@ -160,8 +176,44 @@ const Profile: React.FC = () => {
                     value={shortDescription}
                     onChange={(e) => setShortDescription(e.target.value)}
                     required
+                    style={{ color: 'black' }}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
+                </div>
+                <div>
+                  <label htmlFor="thumbnailUrl" className="block text-sm font-medium text-gray-700">
+                    Thumbnail URL
+                  </label>
+                  <input
+                    type="text"
+                    id="thumbnailUrl"
+                    value={thumbnailUrl}
+                    onChange={(e) => setThumbnailUrl(e.target.value)}
+                    required
+                    style={{ color: 'black' }}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Categories
+                  </label>
+                  <div className="mt-2 space-y-2">
+                    {["Technology", "Health", "Finance", "Education", "Entertainment"].map((category) => (
+                      <div key={category} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={category}
+                          checked={categories?.includes(category)}
+                          onChange={() => handleCategoryChange(category)}
+                          className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                        />
+                        <label htmlFor={category} className="ml-2 block text-sm text-gray-700">
+                          {category}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <div>
                   <label htmlFor="content" className="block text-sm font-medium text-gray-700">

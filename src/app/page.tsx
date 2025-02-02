@@ -13,6 +13,9 @@ interface Post {
   shortDescription: string;
   content: string;
   timestamp: { seconds: number; nanoseconds: number };
+  thumbnailUrl: string; // New field
+  categories: string[]; // New field
+  author: string; // New field
 }
 
 export default function Home() {
@@ -65,7 +68,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="row-start-2 p-8 bg-gray-100">
+      <main className="row-start-2 p-8 ">
         <h2 className="text-2xl font-semibold text-center mb-8">Firestore Posts</h2>
 
         {/* Loading State */}
@@ -80,19 +83,35 @@ export default function Home() {
         )}
 
         {/* Posts List */}
-        <div className="flex flex-col items-center gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {posts.map((post) => (
-            <Link
-              key={post.id}
-              href={`/posts/${post.id}`}
-              className="bg-white p-6 rounded-lg shadow w-full max-w-4xl hover:shadow-lg transition-shadow"
-            >
-              <h3 className="text-2xl font-bold">{post.title}</h3>
-              <p className="text-lg text-gray-700 mt-4">{post.shortDescription || "NA"}</p>
-              <p className="text-sm text-gray-500 mt-4">
-                {new Date(post.timestamp.seconds * 1000).toLocaleString()}
-              </p>
-            </Link>
+            <div key={post.id} className=" p-6 flex">
+              <Link href={`/posts/${post.id}`} className="flex-shrink-0">
+                  
+                
+              {post.thumbnailUrl ? (
+                <img src={post.thumbnailUrl} alt="Thumbnail" className="w-40 h-40 rounded-lg mr-4" />
+              ) : (
+                <div className="w-40 h-40  rounded-lg flex items-center justify-center mr-4">
+                  <span>Unknown</span>
+                </div>
+              )}</Link>
+              <div className="flex flex-col justify-between">
+                <Link href={`/posts/${post.id}`} className="text-2xl font-bold hover:text-gray-600">
+                  {post.title}
+                </Link>
+                <p className="text-sm  mt-2">
+                  <strong>Author:</strong> {post.author || <span>Unknown</span>}
+                </p>
+                <p className="text-lg  mt-2">{post.shortDescription || "NA"}</p>
+                <p className="text-sm  mt-2">
+                  {new Date(post.timestamp.seconds * 1000).toLocaleString()}
+                </p>
+                <p className="text-sm  mt-2">
+                  {post.categories && post.categories.length > 0 ? <strong>Categories: {post.categories.join(", ")}</strong> : <span></span>}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
 
@@ -101,7 +120,7 @@ export default function Home() {
           <div className="flex justify-center mt-8">
             <button
               onClick={() => fetchPosts()}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              className="px-4 py-2 bg-indigo-600  hover:bg-indigo-700"
             >
               Load more
             </button>

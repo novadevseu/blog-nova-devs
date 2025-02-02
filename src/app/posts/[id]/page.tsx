@@ -23,6 +23,8 @@ interface Post {
   title: string;
   content: string;
   timestamp: { seconds: number; nanoseconds: number };
+  author: string; // New field
+  categories: string[]; // New field
 }
 
 interface Comment {
@@ -170,8 +172,21 @@ const PostPage = () => {
       <header>
         <Navbar />
       </header>
-      <div className="flex items-center justify-center flex-1 bg-gray-100 p-6">
-        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl">
+      <div className="flex items-center justify-center flex-1  p-6">
+        <div className=" p-8 rounded-lg  w-full max-w-4xl">
+          {/* Author, Date, and Categories */}
+          <div className="mb-4">
+            <p className="text-sm text-gray-500">
+              <strong>Author:</strong> {post?.author || "Unknown"}
+            </p>
+            <p className="text-sm text-gray-500">
+              <strong>Published on:</strong> {new Date((post?.timestamp?.seconds ?? 0) * 1000).toLocaleString()}
+            </p>
+            <p className="text-sm text-gray-500">
+              <strong>Categories:</strong> {post!.categories?.length > 0 ? post!.categories.join(", ") : "None"}
+            </p>
+          </div>
+
           <h1 className="text-3xl font-bold mb-4">{post?.title}</h1>
 
           {/* Edit button */}
@@ -200,12 +215,13 @@ const PostPage = () => {
             <h2 className="text-xl font-semibold mb-4">Comments</h2>
 
             {userEmail && (
-              <form onSubmit={handleAddComment} className="mb-6">
+              <form onSubmit={handleAddComment} className="mb-6 ">
                 <textarea
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Write your comment..."
                   className="w-full p-3 border border-gray-300 rounded-md mb-2"
+                  style={{ color: 'black' }}
                   rows={3}
                 ></textarea>
                 <button
