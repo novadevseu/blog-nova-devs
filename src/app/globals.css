@@ -7,16 +7,54 @@
   --foreground: #FFFFFF;
 }
 
+/* Font Faces */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype'),
+       url('/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+
 
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "Work Sans", serif;
   font-optical-sizing: auto;
- 
   font-style: normal;
+ 
+  font-family: 'Inter';
+
+
 }
+/* Estilo base (pantallas pequeñas) */
+#title {
+  font-size: 30px; /* Font size base */
+}
+
+/* Pantallas medianas (Tablets, 768px) */
+@media (min-width: 768px) {
+   #title {
+    font-size: 50px; /* Aumentar ligeramente */
+  }
+}
+
+/* Pantallas grandes (Laptops, 1024px) */
+@media (min-width: 1024px) {
+   #title {
+    font-size: 100px; /* Mayor legibilidad */
+  }
+}
+
+/* Pantallas extra grandes (Desktop, 1440px) */
+@media (min-width: 1440px) {
+   #title {
+    font-size: 120px; /* Tamaño cómodo */
+  }
+}
+
 
 /*Aquí definimos el estilo de la clase .markdown-content que se aplicará a los elementos de Markdown en nuestra aplicación.*/
 

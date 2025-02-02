@@ -1,18 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
 
 import StoreProvider from "./StoreProvider";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer"; // Import Footer component
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -29,14 +21,17 @@ export default function RootLayout({
       <head></head>
       <meta charSet="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="icon" href="/favicon.ico" />
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" />
-      
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <StoreProvider>{children}</StoreProvider>
+
+      <body className="px-20 pt-5">
+        <header className="row-start-1 mb-10">
+          <Navbar />
+        </header>
+        <StoreProvider>
+          {children}
+        </StoreProvider>
+        <footer className="mt-10">
+          <Footer /> {/* Call Footer component */}
+        </footer>
       </body>
     </html>
   );

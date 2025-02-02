@@ -71,9 +71,7 @@ const LoginPage: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navbar */}
-      <header>
-        <Navbar />
-      </header>
+    
 
       {/* Main Content */}
       <div className="flex items-center justify-center flex-1 bg-gray-100">

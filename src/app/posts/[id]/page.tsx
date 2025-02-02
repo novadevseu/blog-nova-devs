@@ -169,9 +169,7 @@ const PostPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header>
-        <Navbar />
-      </header>
+    
       <div className="flex items-center justify-center flex-1  p-6">
         <div className=" p-8 rounded-lg  w-full max-w-4xl">
           {/* Author, Date, and Categories */}

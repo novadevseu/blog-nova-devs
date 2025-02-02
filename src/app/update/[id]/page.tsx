@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../../../config/firebase-config";
-import Navbar from "../../../components/Navbar";
+
 import dynamic from "next/dynamic";
 
 // Load the editor dynamically to avoid SSR issues
@@ -170,11 +170,7 @@ const UpdatePostPage: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navbar */}
-      <header>
-        <Navbar />
-      </header>
-
+    
       {/* Main Content */}
       <div className="flex flex-1 items-center justify-center ">
         <div className=" p-6 rounded-lg  w-full max-w-4xl">

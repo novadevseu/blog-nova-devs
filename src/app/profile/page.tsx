@@ -111,9 +111,7 @@ const Profile: React.FC = () => {
     return (
       <div className="flex flex-col min-h-screen">
         {/* Navbar */}
-        <header>
-          <Navbar />
-        </header>
+        
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
           <p className="mb-4 text-gray-700">You are not authenticated.</p>
           <button
@@ -130,10 +128,7 @@ const Profile: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navbar */}
-      <header>
-        <Navbar />
-      </header>
-
+     
       {/* Main Content */}
       <div className="flex flex-1 items-center justify-center ">
         <div className=" p-6 rounded-lg w-full max-w-4xl">
