@@ -81,7 +81,7 @@ export const loginHook = async ({e,setError,setLoading,email,password,router,set
           email : userData.email,
           uid : userData.uid
         })); 
-        /* localStorage.setItem('uid',userData) */
+        localStorage.setItem('uid',userData.uid);
         router.push("/profile"); 
       } else {
         throw new Error("User information not found in Firestore.");
