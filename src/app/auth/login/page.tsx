@@ -6,6 +6,9 @@ import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../config/firebase-config";
 import Navbar from "../../../components/Navbar"; // Import the Navbar
+import { loginHook } from "@/services/loginHook";
+
+import { useDispatch, UseDispatch } from "react-redux";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -15,40 +18,21 @@ const LoginPage: React.FC = () => {
 
   const router = useRouter(); // Initialize the router
 
+  const dispatch = useDispatch();
+
   // Handle login with email and password
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Directly access the user's document using their UID
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        router.push("/profile");
-      } else {
-        throw new Error("User information not found in Firestore.");
-      }
-
-      setEmail("");
-      setPassword("");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.code === "auth/user-not-found") {
-        setError("User does not exist.");
-      } else if (error.code === "auth/wrong-password") {
-        setError("Incorrect password.");
-      } else {
-        setError(error.message || "Unknown error.");
-      }
-    } finally {
-      setLoading(false);
-    }
+    await loginHook({
+      e,
+      setError,
+      setLoading,
+      email,
+      password,
+      router,
+      setEmail,
+      setPassword,
+      dispatch
+    });
   };
 
   // Handle login with Google

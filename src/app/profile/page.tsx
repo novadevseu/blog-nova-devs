@@ -24,8 +24,11 @@ const Profile: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
 
+  const currentUser = useSelector((state : RootState) => state.currentUser);
   useEffect(() => {
     
+    console.log(currentUser);
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         try {

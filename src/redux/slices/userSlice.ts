@@ -1,10 +1,10 @@
+import { Timestamp } from "@firebase/firestore";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserType {
   uid: string;
-  name: string;
+  email: string;
   role: string;
-  createdAt : Date
 }
 
 interface UserState {
