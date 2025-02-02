@@ -5,6 +5,8 @@ import Link from "next/link";
 import { collection, getDocs, query, orderBy, limit, startAfter, DocumentData } from "firebase/firestore";
 import { db } from "../config/firebase-config";
 import Navbar from "../components/Navbar";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 // Define the interface for a post
 interface Post {
@@ -21,6 +23,15 @@ export default function Home() {
   const [error, setError] = useState("");
   const [lastVisible, setLastVisible] = useState<DocumentData | null>(null);
   const [hasMore, setHasMore] = useState(true);
+
+  const currentUser = useSelector((state : RootState) => state.currentUser);
+  
+  useEffect(() => {
+    
+    console.log(currentUser);
+
+
+  }, [currentUser]);
 
   const POSTS_PER_PAGE = 5;
 
