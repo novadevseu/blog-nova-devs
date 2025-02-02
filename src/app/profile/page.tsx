@@ -8,6 +8,10 @@ import { auth, db } from "../../config/firebase-config";
 import Navbar from "../../components/Navbar";
 import dynamic from "next/dynamic";
 
+// React Redux Toolkit
+import { useSelector, UseSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+
 // Load the editor dynamically to avoid SSR issues
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
@@ -21,6 +25,7 @@ const Profile: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
+    
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         try {

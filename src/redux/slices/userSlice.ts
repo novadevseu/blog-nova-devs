@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface User {
+export interface UserType {
   uid: string;
   name: string;
   role: string;
@@ -8,7 +8,7 @@ interface User {
 }
 
 interface UserState {
-  user: User | null;
+  user: UserType | null;
 }
 
 const initialState: UserState = {
@@ -16,16 +16,16 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: "user",
+  name: "currentUser",
   initialState,
   reducers: {
-    login: (state, action: PayloadAction<User>) => {
+    setUser: (state, action: PayloadAction<UserType>) => {
       state.user = action.payload;
     },
-    logout: (state) => {
+    setUserNull: (state) => {
       state.user = null;
     },
-    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+    updateUser: (state, action: PayloadAction<Partial<UserType>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
       }
@@ -33,5 +33,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { login, logout, updateUser } = userSlice.actions;
+export const { setUser, setUserNull, updateUser } = userSlice.actions;
 export default userSlice.reducer;
