@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../../../config/firebase-config";
-import Navbar from "../../../components/Navbar";
+
 import dynamic from "next/dynamic";
 
 // Load the editor dynamically to avoid SSR issues
@@ -15,6 +15,8 @@ interface Post {
   title: string;
   shortDescription: string;
   content: string;
+  thumbnailUrl: string; // New field
+  categories: string[]; // New field
   timestamp: { seconds: number; nanoseconds: number };
 }
 
@@ -29,6 +31,8 @@ const UpdatePostPage: React.FC = () => {
   const [title, setTitle] = useState("");
   const [shortDescription, setShortDescription] = useState("");
   const [content, setContent] = useState<string | undefined>("");
+  const [thumbnailUrl, setThumbnailUrl] = useState(""); // New field
+  const [categories, setCategories] = useState<string[]>([]); // New field
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -82,6 +86,8 @@ const UpdatePostPage: React.FC = () => {
           setTitle(postData.title);
           setShortDescription(postData.shortDescription);
           setContent(postData.content);
+          setThumbnailUrl(postData.thumbnailUrl); // Set thumbnail URL
+          setCategories(postData.categories); // Set categories
         } else {
           router.push("/404"); // Redirect if the post does not exist
         }
@@ -110,7 +116,8 @@ const UpdatePostPage: React.FC = () => {
         title,
         shortDescription,
         content,
-        timestamp: new Date(),
+        thumbnailUrl, // Include thumbnail URL
+        categories, // Include categories
       });
 
       setSuccessMessage("Post updated successfully!");
@@ -137,6 +144,14 @@ const UpdatePostPage: React.FC = () => {
     }
   };
 
+  const handleCategoryChange = (category: string) => {
+    setCategories((prevCategories) =>
+      prevCategories?.includes(category)
+        ? prevCategories.filter((cat) => cat !== category)
+        : [...prevCategories, category]
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -155,14 +170,10 @@ const UpdatePostPage: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navbar */}
-      <header>
-        <Navbar />
-      </header>
-
+    
       {/* Main Content */}
-      <div className="flex flex-1 items-center justify-center bg-gray-100">
-        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
+      <div className="flex flex-1 items-center justify-center ">
+        <div className=" p-6 rounded-lg  w-full max-w-4xl">
           <h2 className="text-xl font-semibold text-center mb-4">Edit Post</h2>
 
           <form onSubmit={handleUpdatePost} className="space-y-4">
@@ -176,6 +187,7 @@ const UpdatePostPage: React.FC = () => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
+                style={{ color: 'black' }}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
@@ -189,8 +201,44 @@ const UpdatePostPage: React.FC = () => {
                 value={shortDescription}
                 onChange={(e) => setShortDescription(e.target.value)}
                 required
+                style={{ color: 'black' }}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
+            </div>
+            <div>
+              <label htmlFor="thumbnailUrl" className="block text-sm font-medium text-gray-700">
+                Thumbnail URL
+              </label>
+              <input
+                type="text"
+                id="thumbnailUrl"
+                value={thumbnailUrl}
+                onChange={(e) => setThumbnailUrl(e.target.value)}
+                required
+                style={{ color: 'black' }}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Categories
+              </label>
+              <div className="mt-2 space-y-2">
+                {["Technology", "Health", "Finance", "Education", "Entertainment"].map((category) => (
+                  <div key={category} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id={category}
+                      checked={categories?.includes(category)}
+                      onChange={() => handleCategoryChange(category)}
+                      className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                    />
+                    <label htmlFor={category} className="ml-2 block text-sm text-gray-700">
+                      {category}
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
             <div>
               <label htmlFor="content" className="block text-sm font-medium text-gray-700">

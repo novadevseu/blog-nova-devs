@@ -1,4 +1,5 @@
-import { Timestamp } from "@firebase/firestore";
+import { db } from "@/config/firebase-config";
+import { doc, getDoc, Timestamp } from "@firebase/firestore";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserType {

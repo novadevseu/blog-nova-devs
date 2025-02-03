@@ -3,26 +3,67 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #090D1F;
+  --foreground: #FFFFFF;
 }
+
+/* Font Faces */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype'),
+       url('/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
 
 
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+ 
+  font-family: 'Inter';
+
+
 }
+/* Estilo base (pantallas pequeñas) */
+#title {
+  font-size: 30px; /* Font size base */
+}
+
+/* Pantallas medianas (Tablets, 768px) */
+@media (min-width: 768px) {
+   #title {
+    font-size: 50px; /* Aumentar ligeramente */
+  }
+}
+
+/* Pantallas grandes (Laptops, 1024px) */
+@media (min-width: 1024px) {
+   #title {
+    font-size: 100px; /* Mayor legibilidad */
+  }
+}
+
+/* Pantallas extra grandes (Desktop, 1440px) */
+@media (min-width: 1440px) {
+   #title {
+    font-size: 120px; /* Tamaño cómodo */
+  }
+}
+
 
 /*Aquí definimos el estilo de la clase .markdown-content que se aplicará a los elementos de Markdown en nuestra aplicación.*/
 
 .markdown-content {
-  font-family: Arial, sans-serif; /* Fuente limpia y legible */
+   /* Fuente limpia y legible */
   line-height: 1.6; /* Espaciado entre líneas para mejor lectura */
-  color: #333; /* Color de texto */
+   /* Color de texto */
   padding: 1rem; /* Espaciado interno */
-  background-color: #fff; /* Fondo blanco */
+   /* Fondo blanco */
   border-radius: 8px; /* Bordes redondeados */
   
   max-width: 800px; /* Ancho máximo */
@@ -39,29 +80,27 @@ body {
 
 .markdown-content h1 {
   font-size: 2rem;
-  color: #1a73e8; /* Color azul para el encabezado principal */
-  border-bottom: 2px solid #eaeaea; /* Línea debajo del título */
+   /* Color azul para el encabezado principal */
+  border-bottom: 2px solid ; /* Línea debajo del título */
   padding-bottom: 0.5rem;
 }
 
 .markdown-content h2 {
   font-size: 1.75rem;
-  color: #333;
+  
 }
 
 .markdown-content h3 {
   font-size: 1.5rem;
-  color: #555;
+  
 }
 
 .markdown-content p {
   margin-bottom: 1rem;
+  font: 1em source-serif-pro, serif;
 }
 
-.markdown-content a {
-  color: #1a73e8; /* Color de enlace */
-  text-decoration: none;
-}
+
 
 .markdown-content a:hover {
   text-decoration: underline; /* Subrayado al pasar el mouse */
@@ -82,9 +121,10 @@ body {
 }
 
 .markdown-content blockquote {
-  margin: 1rem 0;
-  padding-left: 1rem;
-  border-left: 4px solid #eaeaea;
+  margin: 1rem ;
+  padding: 1rem 1rem 0.2rem 1rem;
+  border-left: 4px solid #c4c3c3;
+  background-color: #242535;
   color: #666;
   font-style: italic;
 }
@@ -109,19 +149,28 @@ body {
 }
 
 .markdown-content th {
-  background-color: #f7f7f7;
+  background-color: #242535;
   font-weight: bold;
 }
 
 .markdown-content code {
-  background-color: #f3f3f3;
+  background-color: #242535;
   padding: 0.2rem 0.4rem;
+ 
   border-radius: 4px;
   font-family: 'Courier New', Courier, monospace;
 }
-
+.markdown-content hr{
+  margin: 1rem 0;
+  border: 0;
+  border-top: 1px solid 
+}
+.markdown-content a {
+  color: #0077cc;
+  text-decoration: none;
+}
 .markdown-content pre {
-  background-color: #f3f3f3;
+  background-color: #242535;
   padding: 1rem;
   border-radius: 8px;
   overflow-x: auto;

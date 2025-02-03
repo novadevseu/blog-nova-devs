@@ -1,16 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { MouseEventHandler, useEffect, useState } from "react";
 import Link from "next/link"; // For navigating between routes in Next.js
+import { UserType } from "@/redux/slices/userSlice";
+import { useUser } from "@/hooks/useUser";
+import Image from "next/image";
 
 const Navbar: React.FC = () => {
+
+  const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
+
+  const handleLogOut = () => {
+    localStorage.removeItem('uid');
+    window.location.reload();
+  }
+
   return (
-    <nav className="bg-indigo-600 text-white py-4">
-      <div className="container mx-auto flex justify-between items-center px-4">
+    <nav className="  py-4">
+      <div className=" mx-auto flex justify-between items-center ">
         {/* Logo */}
-        <div className="text-xl font-bold">
+        <div className="text-xl flex items-center space-x-2 hover:text-gray-500">
           <Link href="/">
-            My App
+            Coffee<span style={{ color: "#E0C600" }}>Script</span> & Chill
+          </Link>
+          <Link href="/">
+            <Image src="/images/jsfile.png" alt="logo" width={60} height={60} />{" "}
           </Link>
         </div>
 
@@ -22,12 +36,25 @@ const Navbar: React.FC = () => {
           <Link href="/profile">
             Profile
           </Link>
-          <Link href="/auth/signup">
-            Sign Up
-          </Link>
-          <Link href="/auth/login">
-            Log In
-          </Link>
+          { 
+            !currentUser ? (
+              <>
+                <Link href="/auth/login">
+                  Log In
+                </Link>
+                <Link href="/auth/signup">
+                  Sign Up
+                </Link>
+              </>
+          )
+          : 
+            <>
+              <button onClick={handleLogOut} >
+                Log Out
+              </button>
+            </>
+        }
+
         </div>
       </div>
     </nav>

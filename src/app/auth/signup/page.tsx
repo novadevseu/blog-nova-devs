@@ -62,9 +62,7 @@ const SignUpPage: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navbar */}
-      <header>
-        <Navbar />
-      </header>
+    
 
       {/* Main Content */}
       <div className="flex flex-1 items-center justify-center bg-gray-100">
