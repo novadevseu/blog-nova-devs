@@ -10,6 +10,10 @@ const Navbar: React.FC = () => {
 
   const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
 
+  useEffect(()=>{
+    console.log(currentUser)
+  },[currentUser])
+
   const handleLogOut = () => {
     localStorage.removeItem('uid');
     window.location.reload();

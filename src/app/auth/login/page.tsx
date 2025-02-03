@@ -42,6 +42,7 @@ const LoginPage: React.FC = () => {
       setError,
       setLoading,
       router,
+      dispatch
     });
   };
 
