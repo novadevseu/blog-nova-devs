@@ -6,39 +6,22 @@ import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } f
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../config/firebase-config";
 import Navbar from "../../../components/Navbar";
+import { useSignUp } from '@/services/signupHook'
 
 const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { signup, error, loading, setError, setLoading } = useSignUp()
   const router = useRouter();
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
 
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Create the record in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        email: user.email,
-        role: "Viewer",
-        createdAt: new Date(),
-      });
-
+    const { success } = await signup(email, password)
+    
+    if (success) {
       alert("Registration successful.");
       router.push("/profile");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error("Error registering user:", error);
-      setError(error.message || "Unknown error.");
-    } finally {
-      setLoading(false);
     }
   };
 
