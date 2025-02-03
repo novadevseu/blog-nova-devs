@@ -10,7 +10,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 interface handleLogin {
     e: React.FormEvent,
     setLoading : React.Dispatch<React.SetStateAction<boolean>>,
-    setError : React.Dispatch<React.SetStateAction<string>>,
+    setError : React.Dispatch<React.SetStateAction<string | null>>,
     email : string,
     password : string,
     router : AppRouterInstance,

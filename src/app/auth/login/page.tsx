@@ -15,7 +15,7 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<null | string>(null);
 
   const router = useRouter(); // Initialize the router
 

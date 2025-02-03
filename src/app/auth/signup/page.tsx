@@ -7,57 +7,38 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../config/firebase-config";
 import Navbar from "../../../components/Navbar";
 import { useSignUp } from '@/services/signupHook'
+import { googleLoginHook } from "@/services/googleLoginHook";
+import { useDispatch } from "react-redux";
 
 const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signup, error, loading, setError, setLoading } = useSignUp()
+  const [error,setError] = useState<null | string>(null);
+  const [loading,setLoading] = useState(false);
   const router = useRouter();
+
+  const dispatch = useDispatch();
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { success } = await signup(email, password)
+    await useSignUp({email,password,setError,setLoading,dispatch})
     
-    if (success) {
+    if (!error) {
       alert("Registration successful.");
       router.push("/profile");
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
-    setError("");
+      await googleLoginHook({
+        setError,
+        setLoading,
+        router,
+        dispatch
+      });
+    };
 
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Check if the user already exists in Firestore
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (!userDoc.exists()) {
-        // If not, create a new record
-        await setDoc(userDocRef, {
-          uid: user.uid,
-          email: user.email,
-          role: "Viewer",
-          createdAt: new Date(),
-        });
-      }
-
-      alert("Login successful.");
-      router.push("/profile");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error("Error during Google authentication:", error);
-      setError(error.message || "Unknown error.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="flex flex-col min-h-screen">

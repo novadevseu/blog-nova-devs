@@ -6,7 +6,7 @@ import { setUser, UserType } from "@/redux/slices/userSlice";
 import { useDispatch } from "react-redux";
 
 interface GoogleLoginProps {
-  setError : React.Dispatch<React.SetStateAction<string>>,
+  setError : React.Dispatch<React.SetStateAction<string | null>>,
   setLoading : React.Dispatch<React.SetStateAction<boolean>>,
   router: AppRouterInstance;
   dispatch: ReturnType<typeof useDispatch>
