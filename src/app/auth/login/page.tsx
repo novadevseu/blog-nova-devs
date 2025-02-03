@@ -7,6 +7,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../config/firebase-config";
 import Navbar from "../../../components/Navbar"; // Import the Navbar
 import { loginHook } from "@/services/loginHook";
+import { googleLoginHook } from "@/services/googleLoginHook";
 
 import { useDispatch, UseDispatch } from "react-redux";
 
@@ -37,35 +38,11 @@ const LoginPage: React.FC = () => {
 
   // Handle login with Google
   const handleGoogleSignIn = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (!userDoc.exists()) {
-        // Create document if the user does not exist in Firestore
-        await setDoc(userDocRef, {
-          uid: user.uid,
-          email: user.email,
-          role: "Viewer",
-          createdAt: new Date(),
-        });
-      }
-
-      router.push("/profile");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.error("Error during Google Sign-In:", error);
-      setError(error.message || "Unknown error.");
-    } finally {
-      setLoading(false);
-    }
+    await googleLoginHook({
+      setError,
+      setLoading,
+      router,
+    });
   };
 
   return (
