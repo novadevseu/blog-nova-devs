@@ -7,6 +7,8 @@ import { db } from "../config/firebase-config";
 import Navbar from "../components/Navbar";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { UserType } from "@/redux/slices/userSlice";
+import { useUser } from "@/hooks/useUser";
 
 // Define the interface for a post
 interface Post {
@@ -24,15 +26,8 @@ export default function Home() {
   const [lastVisible, setLastVisible] = useState<DocumentData | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
-  const currentUser = useSelector((state : RootState) => state.currentUser);
+  const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
   
-  useEffect(() => {
-    
-    console.log(currentUser);
-
-
-  }, [currentUser]);
-
   const POSTS_PER_PAGE = 5;
 
   const fetchPosts = async (reset = false) => {

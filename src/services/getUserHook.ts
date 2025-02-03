@@ -4,14 +4,15 @@ import { doc, getDoc } from "@firebase/firestore";
 import { Dispatch } from "@reduxjs/toolkit";
 
 export const getUserData = async (dispatch : Dispatch) => {
-    try {
-      const userId = localStorage.getItem('user-id');
-  
+    
+      const userId = localStorage.getItem('uid');
+
       if (!userId) {
-        console.error("User ID not found in localStorage.");
         return null;
       }
-  
+
+      try {
+
       const userDocRef = doc(db, "users", userId);
       const userDoc = await getDoc(userDocRef);
   

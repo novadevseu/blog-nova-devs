@@ -11,6 +11,8 @@ import dynamic from "next/dynamic";
 // React Redux Toolkit
 import { useSelector, UseSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { useUser } from "@/hooks/useUser";
+import { UserType } from "@/redux/slices/userSlice";
 
 // Load the editor dynamically to avoid SSR issues
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
@@ -24,10 +26,13 @@ const Profile: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
 
-  const currentUser = useSelector((state : RootState) => state.currentUser);
-  useEffect(() => {
-    
+  const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
+
+  useEffect(()=>{
     console.log(currentUser);
+  },[currentUser])
+
+  useEffect(() => {
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
