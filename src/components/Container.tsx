@@ -4,6 +4,8 @@
 import { getUserData } from "@/services/getUserHook";
 import { ReactNode, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 export default function Container({ children }: { children: ReactNode }) {
 
@@ -14,15 +16,17 @@ export default function Container({ children }: { children: ReactNode }) {
 
         ( async () => {
             await getUserData(dispatch);
+            setIsReady(true);
         } )();
-
-        setIsReady(true);
+        
     },[])
 
     if(isReady)
   return (
     <div>
+        <Navbar />
         {children}
+        <Footer />
     </div>
   );
   else return (
