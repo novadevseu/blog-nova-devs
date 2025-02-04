@@ -47,11 +47,14 @@ export const googleLoginHook = async ({
       localStorage.setItem('uid',user.uid);
     }
 
+    window.location.reload();
     router.push("/profile");
+
   } catch (error: any) {
     console.error("Error during Google Sign-In:", error);
     setError(error.message || "Unknown error.");
   } finally {
     setLoading(false);
   }
+
 }; 

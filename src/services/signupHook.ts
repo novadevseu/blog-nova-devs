@@ -19,11 +19,9 @@ export const useSignUp = async ({email,password,setError,setLoading,dispatch} : 
     setError(null)
 
     try {
-      console.log('naber1')
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password) // error here
+     
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password) 
       const user = userCredential.user
-
-      console.log('naber1',user)
 
       // Create the record in Firestore
       await setDoc(doc(db, "users", user.uid), {
@@ -33,15 +31,11 @@ export const useSignUp = async ({email,password,setError,setLoading,dispatch} : 
         createdAt: new Date(),
       })
 
-      console.log('naber2',user)
-
       dispatch(setUser({
         email : user.email!,
         role : "Viewer",
         uid : user.uid
       }));
-
-      console.log(user)
 
       localStorage.setItem('uid',user.uid);
 

@@ -26,6 +26,7 @@ const SignUpPage: React.FC = () => {
     
     if (!error) {
       alert("Registration successful.");
+      window.location.reload();
       router.push("/profile");
     }
   };
