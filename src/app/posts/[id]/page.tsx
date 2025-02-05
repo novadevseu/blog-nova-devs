@@ -18,6 +18,11 @@ import Navbar from "../../../components/Navbar";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { onAuthStateChanged } from "firebase/auth";
+import { UserType } from "@/redux/slices/userSlice";
+import { useUser } from "@/hooks/useUser";
+import CommentComponent from "@/components/CommentSection";
+
+
 
 interface Post {
   title: string;
@@ -46,6 +51,8 @@ const PostPage = () => {
   const [error, setError] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter();
+
+  const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -212,7 +219,7 @@ const PostPage = () => {
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4">Comments</h2>
 
-            {userEmail && (
+        {/*     {userEmail && (
               <form onSubmit={handleAddComment} className="mb-6 ">
                 <textarea
                   value={newComment}
@@ -229,7 +236,9 @@ const PostPage = () => {
                   Comment
                 </button>
               </form>
-            )}
+            )}  */}
+
+            <CommentComponent />
 
             {comments.map((comment) => (
               <div key={comment.id} className="border-b border-gray-200 pb-4 mb-4">
