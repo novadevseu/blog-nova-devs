@@ -15,10 +15,9 @@ export const fetchCommentsHook = ({ id, setComments }: FetchComments) => {
     const fetchedComments = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-        replies: [] // Replies için boş bir array ekliyoruz
+        replies: [] 
     })) as unknown as Comment[];
 
-    // Parent ID'ye göre yorumları gruplamak için bir Map oluştur
     const commentMap = new Map<string | null, Comment[]>();
 
     fetchedComments.forEach((comment) => {
@@ -31,10 +30,9 @@ export const fetchCommentsHook = ({ id, setComments }: FetchComments) => {
       commentMap.get(parentId)?.push(comment);
     });
 
-    // Parent yorumları çocuklarıyla eşleştir
     const nestedComments = (commentMap.get(null) || []).map((parent) => ({
       ...parent,
-      replies: commentMap.get(parent.id) || [], // Eğer replies varsa ekle, yoksa boş array
+      replies: commentMap.get(parent.id) || [], 
     }));
 
     setComments(nestedComments);

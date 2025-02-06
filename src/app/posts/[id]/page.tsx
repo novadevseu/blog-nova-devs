@@ -36,6 +36,7 @@ const PostPage = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [replyComment,setReplyComment] = useState("");
   const [selectedCommentId,setSelectedCommentId] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -74,8 +75,8 @@ const PostPage = () => {
     addCommentHook({e,id,newComment,setNewComment,userEmail,selectedCommentId});
   }
 
-  const handleReplyComment = (e : React.FormEvent, commentId : string) => {
-    addCommentHook({e,id,newComment,selectedCommentId,setNewComment,userEmail})
+  const handleReplyComment = (e : React.FormEvent) => {
+    addCommentHook({e,id,newComment : replyComment,selectedCommentId,setNewComment,userEmail})
   }
 
   const handleDeleteComment = (commentId : string) => {
@@ -170,17 +171,28 @@ const PostPage = () => {
               </form>
             )}  
 
-            {/* <CommentComponent /> */}
+            {/* <CommentComponent />  */}
 
             {comments.map((comment) => (
-              <div key={comment.id} className="border-b border-gray-200 pb-4 mb-4">
+              <div key={comment.id} className=" border-gray-200 pb-4 mb-4">
                 <p className="text-sm font-medium">{comment.email}</p>
                 <p className="text-gray-700">{comment.content}</p>
                 <p className="text-xs text-gray-500">
                   {new Date(comment.timestamp.seconds * 1000).toLocaleString()}
                 </p>
-                {selectedCommentId == comment.id && <form><textarea></textarea></form>}
-                <div className="flex items-center gap-5 mt-2">
+                {
+                  selectedCommentId == comment.id && 
+                  <form>
+                    <textarea 
+                      value={replyComment}
+                      onChange={(e) => setReplyComment(e.target.value)} 
+                      className="w-full p-3 border border-gray-300 rounded-md mb-2"
+                      style={{ color: 'black' }}
+                      rows={3}
+                    ></textarea>
+                  </form>
+                }
+                <div className="flex items-center gap-5 mt-2 border-b pb-5">
                   {selectedCommentId != comment.id ? 
                   <>
                     <button
@@ -201,14 +213,17 @@ const PostPage = () => {
                   : 
                   <>
                   <button
-                    onClick={(e) => handleReplyComment(e,comment.id)}
+                    onClick={(e) => handleReplyComment(e)}
                     className="text-blue-500 text-sm"
                   >
                     Submit
                   </button>
                   {userRole === "Admin" && (
                     <button
-                      onClick={() => setSelectedCommentId(null)}
+                      onClick={() => {
+                        setSelectedCommentId(null)
+                        setReplyComment("")
+                      }}
                       className="text-red-500 text-sm"
                     >
                       Cancel
@@ -216,19 +231,26 @@ const PostPage = () => {
                   )}
                   </> 
                   }
+                </div>  
                   {
                     comment.replies && 
-                    comment.replies.length && 
-                    comment.replies.map((innerComment : Comment) => {
-                      return (
-                        <>
-                          <div>{comment.content}</div>
-                          
-                        </>
-                      )
-                    } ) 
-                  }
-                </div>    
+                    comment.replies.length > 1 && 
+                    <div>
+                      {
+                        comment.replies.map((innerComment : Comment) => {
+                          return (
+                            <div key={innerComment.id} className="border-b border-gray-200 pb-4 mt-6 ml-10">
+                              <p className="text-sm font-medium">{innerComment.email}</p>
+                              <p className="text-gray-700">{innerComment.content}</p>
+                              <p className="text-xs text-gray-500">
+                              {new Date(innerComment.timestamp.seconds * 1000).toLocaleString()}
+                              </p>
+                            </div>
+                          )
+                        } ) 
+                      }
+                    </div>
+                  }  
               </div>
             ))} 
           </div>
