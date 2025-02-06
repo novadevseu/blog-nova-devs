@@ -21,27 +21,14 @@ import { onAuthStateChanged } from "firebase/auth";
 import { UserType } from "@/redux/slices/userSlice";
 import { useUser } from "@/hooks/useUser";
 import CommentComponent from "@/components/CommentSection";
-
-
-
-interface Post {
-  title: string;
-  content: string;
-  timestamp: { seconds: number; nanoseconds: number };
-  author: string; // New field
-  categories: string[]; // New field
-}
-
-interface Comment {
-  id: string;
-  email: string;
-  content: string;
-  timestamp: { seconds: number; nanoseconds: number };
-}
+import { Post } from "@/types/PostType";
+import { Comment } from "@/types/CommentType";
+import { fetchPostHook } from "@/services/posts/fetchPostsHook";
+import { fetchCommentsHook } from "@/services/comments/fetchCommentsHook";
 
 const PostPage = () => {
   const params = useParams();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id; // Ensure id is a string
+  const id  = Array.isArray(params.id) ? params.id[0] : params.id as string; // Ensure id is a string
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -55,30 +42,7 @@ const PostPage = () => {
   const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
 
   useEffect(() => {
-    const fetchPost = async () => {
-      if (!id) {
-        setError("No valid ID provided.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const postRef = doc(db, "posts", id);
-        const postDoc = await getDoc(postRef);
-
-        if (postDoc.exists()) {
-          setPost(postDoc.data() as Post);
-        } else {
-          setError("The post does not exist.");
-        }
-      } catch (err) {
-        console.error("Error fetching post:", err);
-        setError("There was an error loading the post.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
+   
     const fetchComments = () => {
       const commentsRef = collection(db, "comments");
       const q = query(
@@ -114,8 +78,8 @@ const PostPage = () => {
       });
     };
 
-    fetchPost();
-    const unsubscribeComments = fetchComments();
+    fetchPostHook({id,setError,setLoading,setPost});
+    const unsubscribeComments = fetchCommentsHook({id,setComments});
     fetchUserRole();
 
     return () => unsubscribeComments();
