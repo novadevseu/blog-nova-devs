@@ -1,22 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../config/firebase-config";
 import Navbar from "../../../components/Navbar";
-import { useSignUp } from '@/services/signupHook'
-import { googleLoginHook } from "@/services/googleLoginHook";
+import { useSignUp } from '@/services/auth/signupHook'
+import { googleLoginHook } from "@/services/auth/googleLoginHook";
 import { useDispatch } from "react-redux";
+import { UserType } from "@/redux/slices/userSlice";
+import { useUser } from "@/hooks/useUser";
 
 const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error,setError] = useState<null | string>(null);
   const [loading,setLoading] = useState(false);
-  const router = useRouter();
+  const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
+  
+  useEffect(()=>{
+    if(currentUser) router.push('/profile')
+  },[currentUser])
 
+  const router = useRouter();
   const dispatch = useDispatch();
 
   const handleEmailSignUp = async (e: React.FormEvent) => {

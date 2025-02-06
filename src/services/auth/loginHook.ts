@@ -42,7 +42,6 @@ export const loginHook = async ({e,setError,setLoading,email,password,router,set
         })); 
 
         localStorage.setItem('uid',userData.uid);
-
         window.location.reload();
         router.push("/profile"); 
         

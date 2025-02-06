@@ -1,6 +1,6 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db } from "../config/firebase-config";
+import { auth, db } from "../../config/firebase-config";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { setUser, UserType } from "@/redux/slices/userSlice";
 import { useDispatch } from "react-redux";

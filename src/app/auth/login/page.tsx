@@ -1,25 +1,32 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // Import the router
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../config/firebase-config";
 import Navbar from "../../../components/Navbar"; // Import the Navbar
-import { loginHook } from "@/services/loginHook";
-import { googleLoginHook } from "@/services/googleLoginHook";
+import { loginHook } from "@/services/auth/loginHook";
+import { googleLoginHook } from "@/services/auth/googleLoginHook";
 
 import { useDispatch, UseDispatch } from "react-redux";
+import { UserType } from "@/redux/slices/userSlice";
+import { useUser } from "@/hooks/useUser";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
-
+  const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
+  
   const router = useRouter(); // Initialize the router
 
   const dispatch = useDispatch();
+
+  useEffect(()=>{
+    if(currentUser) router.push('/profile')
+  },[currentUser])
 
   // Handle login with email and password
   const handleLogin = async (e: React.FormEvent) => {

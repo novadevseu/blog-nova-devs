@@ -1,7 +1,7 @@
 // components/Container.tsx (Client Component)
 "use client";
 
-import { getUserData } from "@/services/getUserHook";
+import { getUserData } from "@/services/auth/getUserHook";
 import { ReactNode, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import Navbar from "./Navbar";
