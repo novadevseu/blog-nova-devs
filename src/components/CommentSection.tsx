@@ -2,6 +2,12 @@
 import { CommentSection } from 'react-comments-section'
 import 'react-comments-section/dist/index.css'
 
+interface CommentComponentInterface {
+  userId : string,
+  commentId : string,
+
+}
+
 const CommentComponent = () => {
 
   const userId = '01a';

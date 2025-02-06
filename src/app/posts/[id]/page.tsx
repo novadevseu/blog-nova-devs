@@ -12,6 +12,8 @@ import {
   addDoc,
   deleteDoc,
   onSnapshot,
+  getDocs,
+  updateDoc,
 } from "firebase/firestore";
 import { db, auth } from "../../../config/firebase-config";
 import Navbar from "../../../components/Navbar";
@@ -25,6 +27,8 @@ import { Post } from "@/types/PostType";
 import { Comment } from "@/types/CommentType";
 import { fetchPostHook } from "@/services/posts/fetchPostsHook";
 import { fetchCommentsHook } from "@/services/comments/fetchCommentsHook";
+import { addCommentHook } from "@/services/comments/addCommentHooks";
+import { deleteCommentHook } from "@/services/comments/deleteCommentHook";
 
 const PostPage = () => {
   const params = useParams();
@@ -32,6 +36,7 @@ const PostPage = () => {
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [selectedCommentId,setSelectedCommentId] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,41 +46,21 @@ const PostPage = () => {
 
   const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
 
+  useEffect(()=>{
+    console.log('naber3',comments)
+  },[comments])
+
   useEffect(() => {
-   
-    const fetchComments = () => {
-      const commentsRef = collection(db, "comments");
-      const q = query(
-        commentsRef,
-        where("postId", "==", id),
-        orderBy("timestamp", "desc")
-      );
-
-      return onSnapshot(q, (snapshot) => {
-        const fetchedComments = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Comment[];
-        setComments(fetchedComments);
-      });
-    };
-
     const fetchUserRole = async () => {
-      onAuthStateChanged(auth, async (currentUser) => {
         if (currentUser) {
           try {
-            const userRef = doc(db, "users", currentUser.uid);
-            const userDoc = await getDoc(userRef);
-            if (userDoc.exists()) {
-              const userData = userDoc.data();
-              setUserRole(userData.role as string);
+              setUserRole(currentUser.role);
               setUserEmail(currentUser.email);
             }
-          } catch (err) {
+           catch (err) {
             console.error("Error loading user role:", err);
           }
         }
-      });
     };
 
     fetchPostHook({id,setError,setLoading,setPost});
@@ -85,47 +70,19 @@ const PostPage = () => {
     return () => unsubscribeComments();
   }, [id]);
 
-  const handleAddComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment || !id || !userEmail) return;
-
-    try {
-      await addDoc(collection(db, "comments"), {
-        postId: id,
-        email: userEmail,
-        content: newComment,
-        timestamp: new Date(),
-      });
-      setNewComment("");
-    } catch (err) {
-      console.error("Error adding comment:", err);
-    }
-  };
-
-  const handleDeleteComment = async (commentId: string) => {
-    if (confirm("Are you sure you want to delete this comment?")) {
-      try {
-        await deleteDoc(doc(db, "comments", commentId));
-      } catch (err) {
-        console.error("Error deleting comment:", err);
-      }
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <header>
-          <Navbar />
-        </header>
-        <div className="flex items-center justify-center flex-1">
-          Loading...
-        </div>
-      </div>
-    );
+  const handleAddComment = (e : React.FormEvent) => {
+    addCommentHook({e,id,newComment,setNewComment,userEmail,selectedCommentId});
   }
 
-  if (error) {
+  const handleReplyComment = (e : React.FormEvent, commentId : string) => {
+    addCommentHook({e,id,newComment,selectedCommentId,setNewComment,userEmail})
+  }
+
+  const handleDeleteComment = (commentId : string) => {
+    deleteCommentHook(commentId);
+  }
+
+  if (error) 
     return (
       <div className="flex flex-col min-h-screen">
         <header>
@@ -136,7 +93,18 @@ const PostPage = () => {
         </div>
       </div>
     );
-  }
+
+  if (loading) 
+    return (
+      <div className="flex flex-col min-h-screen">
+        <header>
+          <Navbar />
+        </header>
+        <div className="flex items-center justify-center flex-1">
+          Loading...
+        </div>
+      </div>
+    );
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -183,7 +151,7 @@ const PostPage = () => {
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4">Comments</h2>
 
-        {/*     {userEmail && (
+             {userEmail && (
               <form onSubmit={handleAddComment} className="mb-6 ">
                 <textarea
                   value={newComment}
@@ -200,9 +168,9 @@ const PostPage = () => {
                   Comment
                 </button>
               </form>
-            )}  */}
+            )}  
 
-            <CommentComponent />
+            {/* <CommentComponent /> */}
 
             {comments.map((comment) => (
               <div key={comment.id} className="border-b border-gray-200 pb-4 mb-4">
@@ -211,16 +179,58 @@ const PostPage = () => {
                 <p className="text-xs text-gray-500">
                   {new Date(comment.timestamp.seconds * 1000).toLocaleString()}
                 </p>
-                {userRole === "Admin" && (
+                {selectedCommentId == comment.id && <form><textarea></textarea></form>}
+                <div className="flex items-center gap-5 mt-2">
+                  {selectedCommentId != comment.id ? 
+                  <>
+                    <button
+                      onClick={() => setSelectedCommentId(comment.id)}
+                      className="text-blue-500 text-sm"
+                    >
+                      Reply
+                    </button>
+                    {userRole === "Admin" && (
+                      <button
+                        onClick={() => handleDeleteComment(comment.id)}
+                        className="text-red-500 text-sm"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </> 
+                  : 
+                  <>
                   <button
-                    onClick={() => handleDeleteComment(comment.id)}
-                    className="text-red-500 text-sm mt-2"
+                    onClick={(e) => handleReplyComment(e,comment.id)}
+                    className="text-blue-500 text-sm"
                   >
-                    Delete
+                    Submit
                   </button>
-                )}
+                  {userRole === "Admin" && (
+                    <button
+                      onClick={() => setSelectedCommentId(null)}
+                      className="text-red-500 text-sm"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                  </> 
+                  }
+                  {
+                    comment.replies && 
+                    comment.replies.length && 
+                    comment.replies.map((innerComment : Comment) => {
+                      return (
+                        <>
+                          <div>{comment.content}</div>
+                          
+                        </>
+                      )
+                    } ) 
+                  }
+                </div>    
               </div>
-            ))}
+            ))} 
           </div>
         </div>
       </div>

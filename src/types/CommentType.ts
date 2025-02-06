@@ -3,4 +3,6 @@ export interface Comment {
   email: string;
   content: string;
   timestamp: { seconds: number; nanoseconds: number };
+  parentCommentId : string;
+  replies ?: Comment[];
 }
