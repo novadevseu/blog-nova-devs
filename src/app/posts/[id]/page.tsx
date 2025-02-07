@@ -99,7 +99,7 @@ const PostPage = () => {
     return (
       <div className="flex flex-col min-h-screen">
         <header>
-          <Navbar />
+         
         </header>
         <div className="flex items-center justify-center flex-1">
           Loading...
