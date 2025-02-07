@@ -1,5 +1,8 @@
+"use client";
 import Link from "next/link";
 import React from "react";
+import Skeleton from "react-loading-skeleton";
+import 'react-loading-skeleton/dist/skeleton.css';
 
 interface Post {
   id: string;
@@ -14,69 +17,81 @@ interface Post {
 
 interface PostListProps {
   posts: Post[];
+  loading: boolean;
 }
 
-const AllPosts: React.FC<PostListProps> = ({ posts }) => {
-  return (
-    <section className="all-posts py-8 ">
-   <h2 className="text-2xl font-bold text-center mb-6">All Posts</h2>
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
-      
-        {posts.map((post) => (
-          <div key={post.id} className="flex flex-col overflow-hidden">
-            {/* Thumbnail Section */}
-            <div className="w-full h-48 flex-shrink-0">
-              {post.thumbnailUrl ? (
-                <img
-                  src={post.thumbnailUrl}
-                  alt="Thumbnail"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-700">
-                  <span>Image Unavailable</span>
-                </div>
-              )}
-            </div>
-
-            {/* Content Section */}
-            <div className="p-4 flex flex-col justify-between">
-              <p className="text-sm text-purple-400">
-                {new Date(post.timestamp.seconds * 1000).toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-              <Link
-                href={`/posts/${post.id}`}
-                className="text-xl font-bold hover:text-purple-300 mt-2"
-              >
-                {post.title}
-              </Link>
-              <p className="text-gray-300 mt-2">{post.shortDescription || "NA"}</p>
-              <div className="flex flex-wrap mt-4 gap-2">
-                {post.categories.map((category, index) => (
-                  <span
-                    key={index}
-                    className="bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full"
-                  >
-                    {category}
-                  </span>
-                ))}
-              </div>
-              <Link
-                href={`/posts/${post.id}`}
-                className="text-sm text-purple-400 hover:text-purple-300 mt-4"
-              >
-                Read more...
-              </Link>
+const AllPosts: React.FC<PostListProps> = ({ posts, loading }) => {
+  if (loading && posts.length === 0) {
+    // Render skeleton loaders for 6 expected post cards
+    return (
+      <div className="grid gap-6">
+        {[...Array(6)].map((_, index) => (
+          <div key={index} className="bg-transparent rounded overflow-hidden">
+            <Skeleton height={320} />
+            <div className="p-4">
+              <Skeleton height={20} width="60%" />
+              <Skeleton height={30} width="80%" className="mt-2" />
+              <Skeleton count={3} className="mt-2" />
             </div>
           </div>
         ))}
       </div>
-    </section>
+    );
+  }
+
+  return (
+    <div className="grid gap-6">
+      {posts.map((post) => (
+        <div key={post.id} className="bg-transparent rounded overflow-hidden">
+          <div className="w-full h-80">
+            {post.thumbnailUrl ? (
+              <img
+                src={post.thumbnailUrl}
+                alt={post.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-700">
+                <span className="text-white">Image not available</span>
+              </div>
+            )}
+          </div>
+          <div className="p-4">
+            <p className="text-sm text-gray-500">
+              {new Date(post.timestamp.seconds * 1000).toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+            <Link href={`/posts/${post.id}`}>
+              <span className="block text-2xl font-bold mt-2 cursor-pointer text-gray-800">
+                {post.title}
+              </span>
+            </Link>
+            <p className="text-gray-600 mt-2">
+              {post.shortDescription || "No description available"}
+            </p>
+            <div className="flex flex-wrap mt-4 gap-2">
+              {post.categories.map((category, index) => (
+                <span
+                  key={index}
+                  className="bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full"
+                >
+                  {category}
+                </span>
+              ))}
+            </div>
+            <Link href={`/posts/${post.id}`}>
+              <span className="text-sm text-blue-500 mt-4 cursor-pointer inline-block">
+                Read more...
+              </span>
+            </Link>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
 
