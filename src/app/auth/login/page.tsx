@@ -67,6 +67,12 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const providers = [
+    { name: "Google", color: " hover:border-gray-500 bg-white", icon: "/google.svg", action: handleGoogleSignIn },
+    { name: "Facebook", color: "border-blue-600 hover:border-blue-800 bg-[#0269e3]", icon: "/facebook.svg", action: handleGoogleSignIn },
+    { name: "Apple", color: "border-black hover:border-gray-900 bg-black", icon: "/apple.svg", action: handleGoogleSignIn }
+  ];
+
   return (
     <div className="flex flex-col mt-20">
 
@@ -124,16 +130,22 @@ const LoginPage: React.FC = () => {
             <div className="flex-grow border-t border-gray-400"></div>
           </div>
 
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-red-600 hover:bg-red-700 text-white"
-              }`}
-          >
-            {loading ? "Loading..." : "Log in with Google"}
-          </button>
+          <div className="flex justify-center gap-4">
+            {providers.map((provider) => (
+              <button
+                key={provider.name}
+                onClick={provider.action}
+                disabled={loading}
+                className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : `text-white border-2 ${provider.color}`
+                  }`}
+              >
+                {loading ? "Loading..." : <img src={provider.icon} alt={provider.name} className="w-7 h-7" />}
+              </button>
+            ))}
+          </div>
+
           <div className="mt-6 text-center text-sm text-blue-500 flex justify-between mx-7 underline ">
             <button
               onClick={() => router.push('/auth/signup')}

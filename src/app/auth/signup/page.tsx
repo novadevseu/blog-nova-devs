@@ -33,7 +33,7 @@ const SignUpPage: React.FC = () => {
 
       alert("Registration successful.");
       router.push("/profile");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error registering user:", error);
       setError(error.message || "Unknown error.");
@@ -67,7 +67,7 @@ const SignUpPage: React.FC = () => {
 
       alert("Login successful.");
       router.push("/profile");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error during Google authentication:", error);
       setError(error.message || "Unknown error.");
@@ -76,22 +76,21 @@ const SignUpPage: React.FC = () => {
     }
   };
 
+  const providers = [
+    { name: "Google", color: " hover:border-gray-500 bg-white", icon: "/google.svg", action: handleGoogleSignIn },
+    { name: "Facebook", color: "border-blue-600 hover:border-blue-800 bg-[#0269e3]", icon: "/facebook.svg", action: handleGoogleSignIn },
+    { name: "Apple", color: "border-black hover:border-gray-900 bg-black", icon: "/apple.svg", action: handleGoogleSignIn }
+  ];
+
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Navbar */}
-    
-
+    <div className="flex flex-col mt-20">
       {/* Main Content */}
-      <div className="flex flex-1 items-center justify-center bg-gray-100">
-        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-semibold text-center mb-4">
-            Sign Up
-          </h2>
-
-          {/* Email Sign-Up Form */}
+      <div className="flex items-center justify-center flex-1">
+        <div className="bg-[#0c122a] p-6 rounded-lg shadow-lg w-full max-w-md">
+          <h2 className="text-3xl font-bold mb-6">Sign Up</h2>
           <form onSubmit={handleEmailSignUp} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium">
                 Email
               </label>
               <input
@@ -104,7 +103,7 @@ const SignUpPage: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium">
                 Password
               </label>
               <input
@@ -113,42 +112,56 @@ const SignUpPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="font-black mt-1 mb-3 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
+            {error && (
+              <div className="bg-red-100 text-red-700 p-3 rounded-md text-sm mt-4">
+                {error}
+              </div>
+            )}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
-              }`}
+              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                }`}
             >
               {loading ? "Registering..." : "Sign Up"}
             </button>
           </form>
 
-          <hr className="my-6" />
+          <div className="flex items-center my-6">
+            <div className="flex-grow border-t border-gray-400"></div>
+            <span className="mx-4 font-semibold">or</span>
+            <div className="flex-grow border-t border-gray-400"></div>
+          </div>
 
-          {/* Google Sign-In Button */}
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-red-600 hover:bg-red-700 text-white"
-            }`}
-          >
-            {loading ? "Loading..." : "Continue with Google"}
-          </button>
+          <div className="flex justify-center gap-4">
+            {providers.map((provider) => (
+              <button
+                key={provider.name}
+                onClick={provider.action}
+                disabled={loading}
+                className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : `text-white border-2 ${provider.color}`
+                  }`}
+              >
+                {loading ? "Loading..." : <img src={provider.icon} alt={provider.name} className="w-7 h-7" />}
+              </button>
+            ))}
+          </div>
 
-          {error && (
-            <p className="text-red-500 text-sm mt-4">
-              {error}
-            </p>
-          )}
+          <div className="mt-6 text-center text-sm text-blue-500 flex mx-7 underline justify-center">
+            <button
+              onClick={() => router.push('/auth/login')}
+              className="hover:text-blue-600"
+            >
+              Already have an account?
+            </button>
+          </div>
         </div>
       </div>
     </div>
