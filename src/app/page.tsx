@@ -94,6 +94,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
+    
     <div className="min-h-screen">
       {/* Banner Section */}
       <h2

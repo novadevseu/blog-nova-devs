@@ -24,11 +24,16 @@ interface LastPostsProps {
 
 const LastPosts: React.FC<LastPostsProps> = ({ posts, loading }) => {
   if (loading && posts.length === 0) {
-    // Render a skeleton carousel when loading
+    // Renderizamos un esqueleto de carrusel más vistoso
     return (
       <section className="last-posts py-8">
         <div className="container mx-auto px-4">
-          <Skeleton height={400} />
+          <Skeleton
+            height={400}
+            baseColor="#2c2c2c"
+            highlightColor="#444"
+            className="rounded"
+          />
         </div>
       </section>
     );

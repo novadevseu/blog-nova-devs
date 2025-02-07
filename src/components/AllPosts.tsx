@@ -22,16 +22,37 @@ interface PostListProps {
 
 const AllPosts: React.FC<PostListProps> = ({ posts, loading }) => {
   if (loading && posts.length === 0) {
-    // Render skeleton loaders for 6 expected post cards
+    // Renderizamos esqueletos más vistosos para 6 cards de posts
     return (
       <div className="grid gap-6">
         {[...Array(6)].map((_, index) => (
           <div key={index} className="bg-transparent rounded overflow-hidden">
-            <Skeleton height={320} />
+            <Skeleton
+              height={320}
+              baseColor="#2c2c2c"
+              highlightColor="#444"
+              className="rounded"
+            />
             <div className="p-4">
-              <Skeleton height={20} width="60%" />
-              <Skeleton height={30} width="80%" className="mt-2" />
-              <Skeleton count={3} className="mt-2" />
+              <Skeleton
+                height={20}
+                width="60%"
+                baseColor="#2c2c2c"
+                highlightColor="#444"
+              />
+              <Skeleton
+                height={30}
+                width="80%"
+                className="mt-2 rounded"
+                baseColor="#2c2c2c"
+                highlightColor="#444"
+              />
+              <Skeleton
+                count={3}
+                className="mt-2 rounded"
+                baseColor="#2c2c2c"
+                highlightColor="#444"
+              />
             </div>
           </div>
         ))}
