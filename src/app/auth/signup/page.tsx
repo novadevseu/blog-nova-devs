@@ -1,57 +1,85 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../config/firebase-config";
 import Navbar from "../../../components/Navbar";
-import { useSignUp } from '@/services/auth/signupHook'
-import { googleLoginHook } from "@/services/auth/googleLoginHook";
-import { useDispatch } from "react-redux";
-import { UserType } from "@/redux/slices/userSlice";
-import { useUser } from "@/hooks/useUser";
 
 const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error,setError] = useState<null | string>(null);
-  const [loading,setLoading] = useState(false);
-  const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
-  
-  useEffect(()=>{
-    if(currentUser) router.push('/profile')
-  },[currentUser])
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
-  const dispatch = useDispatch();
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
-    await useSignUp({email,password,setError,setLoading,dispatch})
-    
-    if (!error) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Create the record in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: user.email,
+        role: "Viewer",
+        createdAt: new Date(),
+      });
+
       alert("Registration successful.");
-      window.location.reload();
       router.push("/profile");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Error registering user:", error);
+      setError(error.message || "Unknown error.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-      await googleLoginHook({
-        setError,
-        setLoading,
-        router,
-        dispatch
-      });
-    };
+    setLoading(true);
+    setError("");
 
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if the user already exists in Firestore
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        // If not, create a new record
+        await setDoc(userDocRef, {
+          uid: user.uid,
+          email: user.email,
+          role: "Viewer",
+          createdAt: new Date(),
+        });
+      }
+
+      alert("Login successful.");
+      router.push("/profile");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Error during Google authentication:", error);
+      setError(error.message || "Unknown error.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navbar */}
-    
+
 
       {/* Main Content */}
       <div className="flex flex-1 items-center justify-center bg-gray-100">
@@ -91,11 +119,10 @@ const SignUpPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
-              }`}
+              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                }`}
             >
               {loading ? "Registering..." : "Sign Up"}
             </button>
@@ -107,11 +134,10 @@ const SignUpPage: React.FC = () => {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-red-600 hover:bg-red-700 text-white"
-            }`}
+            className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-red-600 hover:bg-red-700 text-white"
+              }`}
           >
             {loading ? "Loading..." : "Continue with Google"}
           </button>

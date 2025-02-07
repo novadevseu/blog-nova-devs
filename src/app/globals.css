@@ -11,7 +11,7 @@
 @font-face {
   font-family: 'Inter';
   src: url('/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype'),
-       url('/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+    url('/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
 }
@@ -21,34 +21,39 @@ body {
   background: var(--background);
   font-optical-sizing: auto;
   font-style: normal;
- 
+
   font-family: 'Inter';
 
 
 }
+
 /* Estilo base (pantallas pequeñas) */
 #title {
-  font-size: 30px; /* Font size base */
+  font-size: 30px;
+  /* Font size base */
 }
 
 /* Pantallas medianas (Tablets, 768px) */
 @media (min-width: 768px) {
-   #title {
-    font-size: 50px; /* Aumentar ligeramente */
+  #title {
+    font-size: 50px;
+    /* Aumentar ligeramente */
   }
 }
 
 /* Pantallas grandes (Laptops, 1024px) */
 @media (min-width: 1024px) {
-   #title {
-    font-size: 100px; /* Mayor legibilidad */
+  #title {
+    font-size: 100px;
+    /* Mayor legibilidad */
   }
 }
 
 /* Pantallas extra grandes (Desktop, 1440px) */
 @media (min-width: 1440px) {
-   #title {
-    font-size: 120px; /* Tamaño cómodo */
+  #title {
+    font-size: 120px;
+    /* Tamaño cómodo */
   }
 }
 
@@ -56,15 +61,20 @@ body {
 /*Aquí definimos el estilo de la clase .markdown-content que se aplicará a los elementos de Markdown en nuestra aplicación.*/
 
 .markdown-content {
-   /* Fuente limpia y legible */
-  line-height: 1.6; /* Espaciado entre líneas para mejor lectura */
-   /* Color de texto */
-  padding: 1rem; /* Espaciado interno */
-   /* Fondo blanco */
-  border-radius: 8px; /* Bordes redondeados */
-  
-  max-width: 800px; /* Ancho máximo */
-  margin: 0 auto; /* Centrado */
+  /* Fuente limpia y legible */
+  line-height: 1.6;
+  /* Espaciado entre líneas para mejor lectura */
+  /* Color de texto */
+  padding: 1rem;
+  /* Espaciado interno */
+  /* Fondo blanco */
+  border-radius: 8px;
+  /* Bordes redondeados */
+
+  max-width: 800px;
+  /* Ancho máximo */
+  margin: 0 auto;
+  /* Centrado */
 }
 
 .markdown-content h1,
@@ -77,19 +87,20 @@ body {
 
 .markdown-content h1 {
   font-size: 2rem;
-   /* Color azul para el encabezado principal */
-  border-bottom: 2px solid ; /* Línea debajo del título */
+  /* Color azul para el encabezado principal */
+  border-bottom: 2px solid;
+  /* Línea debajo del título */
   padding-bottom: 0.5rem;
 }
 
 .markdown-content h2 {
   font-size: 1.75rem;
-  
+
 }
 
 .markdown-content h3 {
   font-size: 1.5rem;
-  
+
 }
 
 .markdown-content p {
@@ -100,7 +111,8 @@ body {
 
 
 .markdown-content a:hover {
-  text-decoration: underline; /* Subrayado al pasar el mouse */
+  text-decoration: underline;
+  /* Subrayado al pasar el mouse */
 }
 
 .markdown-content ul,
@@ -118,7 +130,7 @@ body {
 }
 
 .markdown-content blockquote {
-  margin: 1rem ;
+  margin: 1rem;
   padding: 1rem 1rem 0.2rem 1rem;
   border-left: 4px solid #c4c3c3;
   background-color: #242535;
@@ -129,7 +141,8 @@ body {
 .markdown-content img {
   max-width: 100%;
   height: auto;
-  border-radius: 4px; /* Bordes redondeados en imágenes */
+  border-radius: 4px;
+  /* Bordes redondeados en imágenes */
 }
 
 .markdown-content table {
@@ -153,19 +166,22 @@ body {
 .markdown-content code {
   background-color: #242535;
   padding: 0.2rem 0.4rem;
- 
+
   border-radius: 4px;
   font-family: 'Courier New', Courier, monospace;
 }
-.markdown-content hr{
+
+.markdown-content hr {
   margin: 1rem 0;
   border: 0;
-  border-top: 1px solid 
+  border-top: 1px solid
 }
+
 .markdown-content a {
   color: #0077cc;
   text-decoration: none;
 }
+
 .markdown-content pre {
   background-color: #242535;
   padding: 1rem;
