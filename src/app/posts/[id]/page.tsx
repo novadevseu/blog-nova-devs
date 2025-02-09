@@ -48,7 +48,7 @@ const PostPage = () => {
   const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
 
   useEffect(()=>{
-    console.log('naber3',comments)
+    console.log(comments)
   },[comments])
 
   useEffect(() => {
@@ -71,20 +71,20 @@ const PostPage = () => {
     return () => unsubscribeComments();
   }, [id]);
 
-  const handleAddComment = (e : React.FormEvent) => {
+  const handleAddComment = async (e : React.FormEvent) => {
     if(!userEmail)
       alert("You need to log in to comment!")
-    addCommentHook({e,id,newComment,setNewComment,userEmail,selectedCommentId});
+    await addCommentHook({e,id,newComment,setNewComment,userEmail,selectedCommentId : null});
   }
 
-  const handleReplyComment = (e : React.FormEvent) => {
+  const handleReplyComment = async (e : React.FormEvent) => {
     if(!userEmail)
       alert("You need to log in to comment!")
-    addCommentHook({e,id,newComment : replyComment,selectedCommentId,setNewComment,userEmail})
+    await addCommentHook({e,id,newComment : replyComment,selectedCommentId,setNewComment,userEmail})
   }
 
-  const handleDeleteComment = (commentId : string) => {
-    deleteCommentHook(commentId);
+  const handleDeleteComment = async (commentId : string) => {
+    await deleteCommentHook(commentId);
   }
 
   if (error) 
@@ -217,7 +217,10 @@ const PostPage = () => {
                   : 
                   <>
                   <button
-                    onClick={(e) => handleReplyComment(e)}
+                    onClick={(e) => {
+                      handleReplyComment(e)
+                      setReplyComment("")
+                    }}
                     className="text-blue-500 text-sm"
                   >
                     Submit
@@ -238,7 +241,7 @@ const PostPage = () => {
                 </div>  
                   {
                     comment.replies && 
-                    comment.replies.length > 1 && 
+                    comment.replies.length >= 1 && 
                     <div>
                       {
                         comment.replies.map((innerComment : Comment) => {
@@ -249,6 +252,14 @@ const PostPage = () => {
                               <p className="text-xs text-gray-500">
                               {new Date(innerComment.timestamp.seconds * 1000).toLocaleString()}
                               </p>
+                              { ((userRole === "Admin" ) || ( userEmail && userEmail == innerComment.email )) && (
+                                <button
+                                  onClick={() => handleDeleteComment(innerComment.id)}
+                                  className="text-red-500 text-sm"
+                                >
+                                  Delete
+                                </button>
+                              )}
                             </div>
                           )
                         } ) 

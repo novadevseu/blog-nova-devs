@@ -14,6 +14,8 @@ export const addCommentHook = async ({e,id,newComment,setNewComment,userEmail,se
     e.preventDefault();
     if (!newComment || !id || !userEmail) return;
 
+    console.log('helo')
+
     try {
       await addDoc(collection(db, "comments"), {
         postId: id,
