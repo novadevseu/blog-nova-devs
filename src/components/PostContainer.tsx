@@ -1,3 +1,4 @@
+import CommentContainer from "@/app/posts/CommentContainer";
 import { useUser } from "@/hooks/useUser";
 import { UserType } from "@/redux/slices/userSlice";
 import { fetchPostHook } from "@/services/posts/fetchPostsHook";
@@ -6,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import CommentContainer from "./CommentContainer";
 
 interface PostContainerInterface {
     id : string,
