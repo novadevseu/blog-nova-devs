@@ -2,9 +2,9 @@
 
 import React, { MouseEventHandler, useEffect, useState } from "react";
 import Link from "next/link"; // For navigating between routes in Next.js
-import { UserType } from "@/redux/slices/userSlice";
 import { useUser } from "@/hooks/useUser";
 import Image from "next/image";
+import { UserType } from "@/types/UserType";
 
 const Navbar: React.FC = () => {
 
@@ -37,9 +37,6 @@ const Navbar: React.FC = () => {
           <Link href="/">
             Home
           </Link>
-          <Link href="/profile">
-            Profile
-          </Link>
           { 
             !currentUser ? (
               <>
@@ -53,6 +50,9 @@ const Navbar: React.FC = () => {
           )
           : 
             <>
+              <Link href="/profile">
+                Profile
+              </Link>
               <button onClick={handleLogOut} >
                 Log Out
               </button>

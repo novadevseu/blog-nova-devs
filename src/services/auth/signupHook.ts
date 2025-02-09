@@ -34,7 +34,8 @@ export const useSignUp = async ({email,password,setError,setLoading,dispatch} : 
       dispatch(setUser({
         email : user.email!,
         role : "Viewer",
-        uid : user.uid
+        uid : user.uid,
+        username : null
       }));
 
       localStorage.setItem('uid',user.uid);

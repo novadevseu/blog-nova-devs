@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Navbar from "../../../components/Navbar";
-import { UserType } from "@/redux/slices/userSlice";
 import { useUser } from "@/hooks/useUser";
-import PostContainer from "@/components/PostContainer";
+import PostContainer from "../PostContainer";
+import { UserType } from "@/types/UserType";
 
 const PostPage = () => {
   const params = useParams();

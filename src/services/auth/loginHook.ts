@@ -1,5 +1,5 @@
 import { auth, db } from "@/config/firebase-config";
-import { UserType } from "@/redux/slices/userSlice";
+import { UserType } from "@/types/UserType";
 import { doc, getDoc } from "@firebase/firestore";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
@@ -33,18 +33,25 @@ export const loginHook = async ({e,setError,setLoading,email,password,router,set
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {
-        const userData : UserType = userDoc.data() as UserType;
+        const userData = userDoc.data() as UserType;
+
+        console.log('hello1')
 
         dispatch(setUser({
           role : userData.role,
           email : userData.email,
-          uid : userData.uid
+          uid : userData.uid,
+          username : userData.username
         })); 
+
+        console.log('hello2')
 
         localStorage.setItem('uid',userData.uid);
         window.location.reload();
         router.push("/profile"); 
         
+        console.log('hello3')
+
       } else {
         throw new Error("User information not found in Firestore.");
       }

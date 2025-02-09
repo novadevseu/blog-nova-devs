@@ -2,8 +2,9 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../config/firebase-config";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { setUser, UserType } from "@/redux/slices/userSlice";
+import { setUser } from "@/redux/slices/userSlice";
 import { useDispatch } from "react-redux";
+import { UserType } from "@/types/UserType";
 
 interface GoogleLoginProps {
   setError : React.Dispatch<React.SetStateAction<string | null>>,
@@ -24,7 +25,7 @@ export const googleLoginHook = async ({
   try {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+    const user = result.user as unknown as UserType;
 
     const userDocRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userDocRef);
@@ -41,14 +42,15 @@ export const googleLoginHook = async ({
       dispatch(setUser({
         role : "Viewer",
         email : user.email!,
-        uid : user.uid!
+        uid : user.uid!,
+        username : user.username
       })); 
 
       localStorage.setItem('uid',user.uid);
     }
 
-    window.location.reload();
-    router.push("/profile");
+    /* window.location.reload();
+    router.push("/profile"); */
 
   } catch (error: any) {
     console.error("Error during Google Sign-In:", error);

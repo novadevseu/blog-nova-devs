@@ -1,12 +1,6 @@
-import { db } from "@/config/firebase-config";
-import { doc, getDoc, Timestamp } from "@firebase/firestore";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export interface UserType {
-  uid: string;
-  email: string;
-  role: string;
-}
+import { UserType } from "@/types/UserType";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UserState {
   user: UserType | null;

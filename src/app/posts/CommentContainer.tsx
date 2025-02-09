@@ -1,9 +1,9 @@
 import { useUser } from "@/hooks/useUser";
-import { UserType } from "@/redux/slices/userSlice";
 import { addCommentHook } from "@/services/comments/addCommentHooks";
 import { deleteCommentHook } from "@/services/comments/deleteCommentHook";
 import { fetchCommentsHook } from "@/services/comments/fetchCommentsHook";
 import { Comment } from "@/types/CommentType"
+import { UserType } from "@/types/UserType";
 import { useEffect, useState } from "react";
 
 interface CommentContainerInterface {

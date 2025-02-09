@@ -1,8 +1,8 @@
 import CommentContainer from "@/app/posts/CommentContainer";
 import { useUser } from "@/hooks/useUser";
-import { UserType } from "@/redux/slices/userSlice";
 import { fetchPostHook } from "@/services/posts/fetchPostsHook";
 import { Post } from "@/types/PostType";
+import { UserType } from "@/types/UserType";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
