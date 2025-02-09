@@ -72,6 +72,8 @@ const PostPage = () => {
   }, [id]);
 
   const handleAddComment = (e : React.FormEvent) => {
+    if(!userEmail)
+      alert("You need to log in to comment!")
     addCommentHook({e,id,newComment,setNewComment,userEmail,selectedCommentId});
   }
 
@@ -152,7 +154,7 @@ const PostPage = () => {
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-4">Comments</h2>
 
-             {userEmail && (
+             {(
               <form onSubmit={handleAddComment} className="mb-6 ">
                 <textarea
                   value={newComment}
