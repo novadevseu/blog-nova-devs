@@ -78,6 +78,8 @@ const PostPage = () => {
   }
 
   const handleReplyComment = (e : React.FormEvent) => {
+    if(!userEmail)
+      alert("You need to log in to comment!")
     addCommentHook({e,id,newComment : replyComment,selectedCommentId,setNewComment,userEmail})
   }
 
