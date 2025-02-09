@@ -1,37 +1,40 @@
-// components/Container.tsx (Client Component)
+// components/Container.tsx
 "use client";
-
-import { getUserData } from "@/services/auth/getUserHook";
-import { ReactNode, useEffect, useState } from "react";
+import React, { useEffect, useState, ReactNode } from "react";
 import { useDispatch } from "react-redux";
+import { getUserData } from "@/services/auth/getUserHook";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
-export default function Container({ children }: { children: ReactNode }) {
+interface ContainerProps {
+  children: ReactNode;
+}
 
-    const [isReady,setIsReady] = useState(false);
-    const dispatch = useDispatch();
+/**
+ * Layout principal que:
+ * - Carga los datos del usuario al inicio.
+ * - Muestra el Navbar, el contenido y el Footer.
+ */
+const Container: React.FC<ContainerProps> = ({ children }) => {
+  const [isReady, setIsReady] = useState(false);
+  const dispatch = useDispatch();
 
-    useEffect(()=>{
+  useEffect(() => {
+    (async () => {
+      await getUserData(dispatch);
+      setIsReady(true);
+    })();
+  }, [dispatch]);
 
-        ( async () => {
-            await getUserData(dispatch);
-            setIsReady(true);
-        } )();
-        
-    },[])
+  if (!isReady) return <div>Loading...</div>;
 
-    if(isReady)
   return (
     <div>
-        <Navbar />
-        {children}
-        <Footer />
+      <Navbar />
+      {children}
+      <Footer />
     </div>
   );
-  else return (
-    <div>
-        Loading...
-    </div>
-  )
-}
+};
+
+export default Container;

@@ -1,99 +1,135 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../config/firebase-config";
 import { useUser } from "@/hooks/useUser";
-import { UserType } from "@/redux/slices/userSlice";
+import { logoutUser } from "@/services/auth/firebaseAuthService";
+import Navbar from "@/components/Navbar";
+import { useDispatch } from "react-redux";
 
+/**
+ * The Profile component relies on Redux and our prebuilt services,
+ * so it does not contain any direct Firebase logic.
+ */
 const Profile: React.FC = () => {
-  const [user, setUser] = useState<null | { email: string; role: string }>(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const [currentUser, setCurrentUser] = useState<null | UserType>(useUser());
+  // Get the current user from Redux using our custom hook.
+  const currentUser = useUser();
 
-  useEffect(() => {
-    console.log(currentUser);
-  }, [currentUser]);
+  // If no user is logged in, display an authentication prompt.
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-transparent">
+        <p className="mb-4 text-gray-300">You are not authenticated.</p>
+        <button
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          onClick={() => router.push("/auth/login")}
+        >
+          Log In
+        </button>
+      </div>
+    );
+  }
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        try {
-          const userDocRef = doc(db, "users", currentUser.uid);
-          const userDoc = await getDoc(userDocRef);
-
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setUser({
-              email: userData.email as string,
-              role: userData.role as string,
-            });
-          } else {
-            setUser(null);
-          }
-        } catch (error) {
-          console.error("Error loading user data:", error);
-          setUser(null);
-        }
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [router]);
-
+  // Logout handler using our service method.
   const handleLogout = async () => {
-    await signOut(auth);
-    router.push("/login");
+    try {
+      await logoutUser(dispatch);
+      router.push("/auth/login");
+    } catch (error) {
+      console.error("Failed to log out:", error);
+      // Optionally, display an error message to the user.
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-          <p className="mb-4 text-gray-700">You are not authenticated.</p>
-          <button
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-            onClick={() => router.push("/login")}
-          >
-            Log In
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Main Content */}
-      <div className="flex flex-1 items-center justify-center">
-        <div className="p-6 rounded-lg w-full max-w-4xl">
-          <h2 className="text-xl font-semibold text-center mb-4">Profile</h2>
+    <div className="min-h-screen bg-transparent">
+      
+      <div className=" flex flex-col items-center justify-center py-10">
+        {/* Main Profile Card */}
+        <div className=" bg-[#0c122a] p-6 rounded-lg w-full max-w-4xl  ">
+          <h2 className="text-2xl font-semibold text-center mb-6 text-white">Profile</h2>
           <div className="text-center mb-6">
-            <p className="text-sm">
-              <strong>Email:</strong> {user.email}
-            </p>
-            <p className="text-sm">
-              <strong>Role:</strong> {user.role}
+            <p className="text-sm text-gray-300">
+              <strong>Email:</strong> {currentUser.email}
             </p>
           </div>
 
-          {/* Botón visible solo para Admins */}
-          {user.role === "Admin" && (
+          {/* Profile Settings Section (placeholders, non-functional) */}
+          <div className="mt-8 bg-transparent p-4 border border-gray-700 rounded-lg">
+            <h3 className="text-xl font-semibold mb-4 text-white">Profile Settings</h3>
+            {/* Profile Picture */}
+            <div className="flex items-center mb-4">
+              <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-500">
+                <img
+                  src={currentUser.img || "https://placehold.co/600x400"}
+                  alt="Profile Picture"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <button
+                className="ml-4 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                // Placeholder: update picture functionality is not implemented.
+              >
+                Update Picture
+              </button>
+            </div>
+            {/* Display Name */}
+            <div className="mb-4">
+              <label className="block text-gray-300 mb-1">Display Name</label>
+              <input
+                type="text"
+                placeholder="Your name"
+                className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
+                disabled
+              />
+            </div>
+            {/* Email Notifications Toggle */}
+            <div className="mb-4 flex items-center">
+              <label className="block text-gray-300 mr-4">Email Notifications</label>
+              <div className="w-6 h-6 flex items-center justify-center bg-green-600 rounded-full">
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="3"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              {/* This toggle is only visual and non-functional. */}
+            </div>
+            {/* Reset Password */}
+            <div className="mb-4">
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                // Placeholder: reset password functionality is not implemented.
+              >
+                Reset Password
+              </button>
+            </div>
+            {/* Update Username */}
+            <div className="mb-4">
+              <label className="block text-gray-300 mb-1">Username</label>
+              <input
+                type="text"
+                placeholder="Update username"
+                className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
+                disabled
+              />
+            </div>
+          </div>
+
+          {/* Admin-only "Create a New Post" Button */}
+          {currentUser.role === "Admin" && (
             <div className="mt-4 text-center">
               <button
                 onClick={() => router.push("/create-post")}
@@ -104,6 +140,7 @@ const Profile: React.FC = () => {
             </div>
           )}
 
+          {/* Logout Button */}
           <button
             onClick={handleLogout}
             className="mt-6 w-full py-2 px-4 bg-red-600 text-white font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none"
