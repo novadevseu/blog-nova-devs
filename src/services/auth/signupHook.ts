@@ -35,7 +35,10 @@ export const useSignUp = async ({email,password,setError,setLoading,dispatch} : 
         email : user.email!,
         role : "Viewer",
         uid : user.uid,
-        username : null
+        username : "",
+        fullName : "",
+        img : "",
+        profile : ""
       }));
 
       localStorage.setItem('uid',user.uid);

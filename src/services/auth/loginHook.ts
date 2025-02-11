@@ -1,73 +1,66 @@
-import { auth, db } from "@/config/firebase-config";
-import { UserType } from "@/types/UserType";
-import { doc, getDoc } from "@firebase/firestore";
-import { signInWithEmailAndPassword } from "firebase/auth";
-
-import { useDispatch } from "react-redux";
+// services/auth/loginHook.ts
+import { loginWithEmail, getOrCreateUserDocument } from "./firebaseAuthService";
 import { setUser } from "@/redux/slices/userSlice";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useDispatch } from "react-redux";
 
-interface handleLogin {
-    e: React.FormEvent,
-    setLoading : React.Dispatch<React.SetStateAction<boolean>>,
-    setError : React.Dispatch<React.SetStateAction<string | null>>,
-    email : string,
-    password : string,
-    router : AppRouterInstance,
-    setEmail : React.Dispatch<React.SetStateAction<string>>,
-    setPassword : React.Dispatch<React.SetStateAction<string>>,
-    dispatch: ReturnType<typeof useDispatch>
+interface LoginHookProps {
+  e: React.FormEvent;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  email: string;
+  password: string;
+  router: AppRouterInstance;
+  setEmail: React.Dispatch<React.SetStateAction<string>>;
+  setPassword: React.Dispatch<React.SetStateAction<string>>;
+  dispatch: ReturnType<typeof useDispatch>;
 }
 
-export const loginHook = async ({e,setError,setLoading,email,password,router,setEmail,setPassword,dispatch} : handleLogin) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+/**
+ * Realiza el proceso de login con email y contraseña:
+ * - Llama a Firebase para autenticar.
+ * - Obtiene o crea el documento del usuario en Firestore.
+ * - Actualiza el estado global y redirige a la página de perfil.
+ */
+export const loginHook = async ({
+  e,
+  setError,
+  setLoading,
+  email,
+  password,
+  router,
+  setEmail,
+  setPassword,
+  dispatch,
+}: LoginHookProps) => {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Directly access the user's document using their UID
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        const userData = userDoc.data() as UserType;
-
-        console.log('hello1')
-
-        dispatch(setUser({
-          role : userData.role,
-          email : userData.email,
-          uid : userData.uid,
-          username : userData.username
-        })); 
-
-        console.log('hello2')
-
-        localStorage.setItem('uid',userData.uid);
-        window.location.reload();
-        router.push("/profile"); 
-        
-        console.log('hello3')
-
-      } else {
-        throw new Error("User information not found in Firestore.");
-      }
-
-      setEmail("");
-      setPassword("");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.code === "auth/user-not-found") {
-        setError("User does not exist.");
-      } else if (error.code === "auth/wrong-password") {
-        setError("Incorrect password.");
-      } else {
-        setError(error.message || "Unknown error.");
-      }
-    } finally {
-      setLoading(false);
+  try {
+    // Intenta iniciar sesión con email y contraseña
+    const user = await loginWithEmail(email, password);
+    // Obtiene (o crea) el documento del usuario en Firestore
+    const userData = await getOrCreateUserDocument({ uid: user.uid, email: user.email });
+    // Actualiza el estado global (Redux)
+    dispatch(setUser(userData));
+    // Guarda el uid en localStorage (opcional)
+    localStorage.setItem("uid", userData.uid);
+    // Limpia los campos del formulario
+    setEmail("");
+    setPassword("");
+    // Redirige al perfil
+    router.push("/profile");
+  } catch (error: any) {
+    // Manejo de errores según el código de error de Firebase
+    if (error.code === "auth/user-not-found") {
+      setError("El usuario no existe.");
+    } else if (error.code === "auth/wrong-password") {
+      setError("Contraseña incorrecta.");
+    } else {
+      setError(error.message || "Error desconocido.");
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};

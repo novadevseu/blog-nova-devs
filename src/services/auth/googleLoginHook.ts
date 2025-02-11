@@ -1,62 +1,47 @@
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db } from "../../config/firebase-config";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+// services/auth/googleLoginHook.ts
+import { loginWithGoogle, getOrCreateUserDocument } from "./firebaseAuthService";
 import { setUser } from "@/redux/slices/userSlice";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useDispatch } from "react-redux";
 import { UserType } from "@/types/UserType";
 
 interface GoogleLoginProps {
-  setError : React.Dispatch<React.SetStateAction<string | null>>,
-  setLoading : React.Dispatch<React.SetStateAction<boolean>>,
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   router: AppRouterInstance;
-  dispatch: ReturnType<typeof useDispatch>
+  dispatch: ReturnType<typeof useDispatch>;
 }
 
+/**
+ * Realiza el proceso de inicio de sesión con Google:
+ * - Utiliza una ventana emergente para autenticar.
+ * - Obtiene o crea el documento del usuario en Firestore.
+ * - Actualiza el estado global y redirige al perfil.
+ */
 export const googleLoginHook = async ({
   setError,
   setLoading,
   router,
-  dispatch
+  dispatch,
 }: GoogleLoginProps) => {
   setLoading(true);
   setError("");
 
   try {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user as unknown as UserType;
-
-    const userDocRef = doc(db, "users", user.uid);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-
-      await setDoc(userDocRef, {
-        uid: user.uid,
-        email: user.email,
-        role: "Viewer",
-        createdAt: new Date(),
-      });
-
-      dispatch(setUser({
-        role : "Viewer",
-        email : user.email!,
-        uid : user.uid!,
-        username : user.username
-      })); 
-
-      localStorage.setItem('uid',user.uid);
-    }
-
-    /* window.location.reload();
-    router.push("/profile"); */
-
+    // Inicia sesión con Google
+    const user = await loginWithGoogle();
+    // Obtiene (o crea) el documento del usuario en Firestore
+    const userData = await getOrCreateUserDocument({ uid: user.uid, email: user.email });
+    // Actualiza Redux
+    dispatch(setUser(userData));
+    // Guarda el uid en localStorage (opcional)
+    localStorage.setItem("uid", userData.uid);
+    // Redirige al perfil
+    router.push("/profile");
   } catch (error: any) {
-    console.error("Error during Google Sign-In:", error);
-    setError(error.message || "Unknown error.");
+    console.error("Error durante la autenticación con Google:", error);
+    setError(error.message || "Error desconocido.");
   } finally {
     setLoading(false);
   }
-
-}; 
+};

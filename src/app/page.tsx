@@ -11,9 +11,9 @@ import {
 } from "firebase/firestore";
 import { db } from "../config/firebase-config";
 
-import LastPosts from "@/components/LastPosts";
-import AllPosts from "@/components/AllPosts";
-import { useUser } from "@/hooks/useUser";
+import LastPosts from "@/app/LastPosts";
+import AllPosts from "@/app/AllPosts";
+
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -35,7 +35,7 @@ const HomePage: React.FC = () => {
   const [lastVisible, setLastVisible] = useState<DocumentData | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
-  const currentUser = useUser();
+
   const POSTS_PER_PAGE = 6; // Load 6 posts per page
 
   const fetchPosts = async (reset = false) => {

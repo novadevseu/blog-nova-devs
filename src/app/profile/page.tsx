@@ -2,104 +2,224 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../config/firebase-config";
 import { useUser } from "@/hooks/useUser";
-import { UserType } from "@/types/UserType";
-import { editUserData } from "@/services/auth/editUserHook";
+import { logoutUser } from "@/services/auth/firebaseAuthService";
 import { useDispatch } from "react-redux";
+import { editUserData } from "@/services/auth/editUserHook";
 
+/**
+ * The Profile component relies on Redux and our prebuilt services,
+ * so it does not contain any direct Firebase logic.
+ */
 const Profile: React.FC = () => {
-
-  const [loading, setLoading] = useState(true);
-  const [username,setUsername] = useState("");
-  const [currentUser, setCurrentUser] = useState<null | UserType>(useUser());
-
-  const dispatch = useDispatch();
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if(currentUser &&currentUser.username){
-      setUsername(currentUser.username)
+  // Get the current user from Redux using our custom hook.
+  const currentUser = useUser();
+
+  // sets if user clicked to edit username or not
+  const [usernameEdit,setUsernameEdit] = useState(false);
+  // sets if user clicked to edit full name or not
+  const [fullNameEdit,setFullNameEdit] = useState(false);
+
+  // contains current input datas in email, username
+  const [formData,setFormData] = useState({
+    fullName : "",
+    username : "",
+  })
+
+  // fetch the user details to the form data
+  useEffect(()=>{
+    if(currentUser){
+      setFormData({
+        fullName : currentUser.fullName,
+        username : currentUser.username
+      })
     }
-    if(currentUser) {
-      setLoading(false);
-    }
-    else router.push("/auth/login")
-    
-  }, [currentUser]);
+  },[currentUser])
 
-  const handleLogOut = () => {
-    localStorage.removeItem('uid');
-    window.location.reload();
-  }
-
-  const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    editUserData(dispatch,{username : username});
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
+  // If no user is logged in, display an authentication prompt.
   if (!currentUser) {
     return (
-      <div className="flex flex-col min-h-screen">
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-          <p className="mb-4 text-gray-700">You are not authenticated.</p>
-          <button
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-            onClick={() => router.push("/login")}
-          >
-            Log In
-          </button>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-transparent">
+        <p className="mb-4 text-gray-300">You are not authenticated.</p>
+        <button
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          onClick={() => router.push("/auth/login")}
+        >
+          Log In
+        </button>
       </div>
     );
   }
 
+  const handleEditUsername = async () => {
+    editUserData(dispatch,{username : formData.username})
+  }
+
+  const handleEditFullName = async () => {
+    editUserData(dispatch,{fullName : formData.fullName})
+  }
+
+  // Logout handler using our service method.
+  const handleLogout = async () => {
+    try {
+      await logoutUser(dispatch);
+      router.push("/auth/login");
+    } catch (error) {
+      console.error("Failed to log out:", error);
+      // Optionally, display an error message to the user.
+    }
+  };
+
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Main Content */}
-      <div className="flex flex-1 items-center justify-center">
-        <div className="p-6 rounded-lg w-full max-w-4xl">
-          <h2 className="text-xl font-semibold text-center mb-4">Profile</h2>
+    <div className="min-h-screen bg-transparent">
+      
+      <div className=" flex flex-col items-center justify-center py-10">
+        {/* Main Profile Card */}
+        <div className=" bg-[#0c122a] p-6 rounded-lg w-full max-w-4xl  ">
+          <h2 className="text-2xl font-semibold text-center mb-6 text-white">Profile</h2>
           <div className="text-center mb-6">
-            <p className="text-sm">
+            <p className="text-sm text-gray-300">
               <strong>Email:</strong> {currentUser.email}
-            </p>
-            <p className="text-sm">
-              <strong>Role:</strong> {currentUser.role}
-            </p>
-            <p className="text-sm">
-              <strong>Username:</strong> {currentUser.username || "You don't have an username"}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-row items-center justify-center gap-x-3">
-            <label htmlFor="username" className="text-white-700">Username:</label>
-            <input 
-              name="username" 
-              type="text"
-              onChange={(e) => setUsername(e.target.value)} 
-              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button 
-              type="submit" 
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-            >
-              Save
-            </button>
-          </form>
+          {/* Profile Settings Section (placeholders, non-functional) */}
+          <div className="mt-8 bg-transparent p-4 border border-gray-700 rounded-lg">
+            <h3 className="text-xl font-semibold mb-4 text-white">Profile Settings</h3>
+            {/* Profile Picture */}
+            <div className="flex items-center mb-4">
+              <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-500">
+                <img
+                  src={currentUser.img || "https://placehold.co/600x400"}
+                  alt="Profile Picture"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <button
+                className="ml-4 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                // Placeholder: update picture functionality is not implemented.
+              >
+                Update Picture
+              </button>
+            </div>
+            {/* Display Name */}
+            <div className="mb-4">
+              <label className="block text-gray-300 mb-1">Display Name</label>
+              <input
+                type="text"
+                placeholder="Your name"
+                className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
+                disabled={!fullNameEdit}
+                value={formData.fullName || "" }
+                onChange={(e)=>setFormData(v => ({...v,fullName : e.target.value}))}
+              />
+              {
+                !fullNameEdit ? (
+                  <button
+                    onClick={() => setFullNameEdit(true)}
+                    className="px-4 py-2 mt-2 bg-blue-600  text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => {
+                        setFullNameEdit(false);
+                        handleEditFullName();
+                      }}
+                      className="px-4 py-2 mt-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 mr-2"
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      onClick={() => {
+                        setFullNameEdit(false);
+                        setFormData((v) => ({ ...v, fullName : currentUser.fullName || "" }));
+                      }}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                )
+              }
+            </div>
+            {/* Email Notifications Toggle */}
+            <div className="mb-4 flex items-center">
+              <label className="block text-gray-300 mr-4">Email Notifications</label>
+              <div className="w-6 h-6 flex items-center justify-center bg-green-600 rounded-full">
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="3"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              {/* This toggle is only visual and non-functional. */}
+            </div>
+            {/* Reset Password */}
+            <div className="mb-4">
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                // Placeholder: reset password functionality is not implemented.
+              >
+                Reset Password
+              </button>
+            </div>
+            {/* Update Username */}
+            <div className="mb-4">
+              <label className="block text-gray-300 mb-1">Username</label>
+              <input
+                type="text"
+                placeholder="Update username"
+                className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
+                disabled={!usernameEdit}
+                onChange={(e)=>setFormData(v => ({...v,username : e.target.value}))}
+                value={formData.username || "" }
+              />
+              {
+                !usernameEdit 
+                ? 
+                  <button 
+                    onClick={()=>setUsernameEdit(true)}
+                    className="px-4 py-2 mt-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                  >
+                    Edit
+                  </button>  
+                : 
+                  <>
+                    <button 
+                      onClick={()=>{
+                        setUsernameEdit(false);
+                        handleEditUsername();
+                      }}
+                      className="px-4 py-2 mt-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 mr-2" 
+                    >Confirm</button>
+                    <button 
+                      onClick={()=>{
+                        setUsernameEdit(false);
+                        setFormData(v => ({...v,username : currentUser.username || ""}));
+                      }} 
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"  
+                    >Cancel</button>
+                  </>
+              }
+            </div>
+          </div>
 
-
-          {/* Botón visible solo para Admins */}
+          {/* Admin-only "Create a New Post" Button */}
           {currentUser.role === "Admin" && (
             <div className="mt-4 text-center">
               <button
@@ -111,8 +231,9 @@ const Profile: React.FC = () => {
             </div>
           )}
 
+          {/* Logout Button */}
           <button
-            onClick={handleLogOut}
+            onClick={handleLogout}
             className="mt-6 w-full py-2 px-4 bg-red-600 text-white font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none"
           >
             Log Out

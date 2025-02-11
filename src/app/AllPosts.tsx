@@ -87,7 +87,7 @@ const AllPosts: React.FC<PostListProps> = ({ posts, loading }) => {
               })}
             </p>
             <Link href={`/posts/${post.id}`}>
-              <span className="block text-2xl font-bold mt-2 cursor-pointer text-gray-800">
+              <span className="block text-2xl font-bold mt-2 cursor-pointer ">
                 {post.title}
               </span>
             </Link>
