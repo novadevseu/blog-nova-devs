@@ -25,6 +25,7 @@ function CommentContainer(
     const [comments, setComments] = useState<Comment[]>([]);
 
     useEffect(() => {
+      
         const fetchUserRole = async () => {
             if (currentUser) {
               try {

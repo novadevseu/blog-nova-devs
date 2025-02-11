@@ -6,6 +6,8 @@ import { useUser } from "@/hooks/useUser";
 import { logoutUser } from "@/services/auth/firebaseAuthService";
 import { useDispatch } from "react-redux";
 import { editUserData } from "@/services/auth/editUserHook";
+import NameContainer from "./NameContainer";
+import UsernameContainer from "./UsernameContainer";
 
 /**
  * The Profile component relies on Redux and our prebuilt services,
@@ -18,15 +20,17 @@ const Profile: React.FC = () => {
   // Get the current user from Redux using our custom hook.
   const currentUser = useUser();
 
-  // sets if user clicked to edit username or not
-  const [usernameEdit,setUsernameEdit] = useState(false);
-  // sets if user clicked to edit full name or not
-  const [fullNameEdit,setFullNameEdit] = useState(false);
-
   // contains current input datas in email, username
   const [formData,setFormData] = useState({
     fullName : "",
     username : "",
+  })
+
+  const [adminFormData,setAdminFormData] = useState({
+    jobDescription : "",
+    company : "",
+    education : "",
+    skills : ""
   })
 
   // fetch the user details to the form data
@@ -52,14 +56,6 @@ const Profile: React.FC = () => {
         </button>
       </div>
     );
-  }
-
-  const handleEditUsername = async () => {
-    editUserData(dispatch,{username : formData.username})
-  }
-
-  const handleEditFullName = async () => {
-    editUserData(dispatch,{fullName : formData.fullName})
   }
 
   // Logout handler using our service method.
@@ -106,48 +102,7 @@ const Profile: React.FC = () => {
               </button>
             </div>
             {/* Display Name */}
-            <div className="mb-4">
-              <label className="block text-gray-300 mb-1">Display Name</label>
-              <input
-                type="text"
-                placeholder="Your name"
-                className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
-                disabled={!fullNameEdit}
-                value={formData.fullName || "" }
-                onChange={(e)=>setFormData(v => ({...v,fullName : e.target.value}))}
-              />
-              {
-                !fullNameEdit ? (
-                  <button
-                    onClick={() => setFullNameEdit(true)}
-                    className="px-4 py-2 mt-2 bg-blue-600  text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    Edit
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => {
-                        setFullNameEdit(false);
-                        handleEditFullName();
-                      }}
-                      className="px-4 py-2 mt-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 mr-2"
-                    >
-                      Confirm
-                    </button>
-                    <button
-                      onClick={() => {
-                        setFullNameEdit(false);
-                        setFormData((v) => ({ ...v, fullName : currentUser.fullName || "" }));
-                      }}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                    >
-                      Cancel
-                    </button>
-                  </>
-                )
-              }
-            </div>
+            <NameContainer {...{formData,setFormData}} />
             {/* Email Notifications Toggle */}
             <div className="mb-4 flex items-center">
               <label className="block text-gray-300 mr-4">Email Notifications</label>
@@ -179,46 +134,50 @@ const Profile: React.FC = () => {
               </button>
             </div>
             {/* Update Username */}
-            <div className="mb-4">
-              <label className="block text-gray-300 mb-1">Username</label>
-              <input
-                type="text"
-                placeholder="Update username"
-                className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
-                disabled={!usernameEdit}
-                onChange={(e)=>setFormData(v => ({...v,username : e.target.value}))}
-                value={formData.username || "" }
-              />
-              {
-                !usernameEdit 
-                ? 
-                  <button 
-                    onClick={()=>setUsernameEdit(true)}
-                    className="px-4 py-2 mt-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                  >
-                    Edit
-                  </button>  
-                : 
-                  <>
-                    <button 
-                      onClick={()=>{
-                        setUsernameEdit(false);
-                        handleEditUsername();
-                      }}
-                      className="px-4 py-2 mt-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 mr-2" 
-                    >Confirm</button>
-                    <button 
-                      onClick={()=>{
-                        setUsernameEdit(false);
-                        setFormData(v => ({...v,username : currentUser.username || ""}));
-                      }} 
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"  
-                    >Cancel</button>
-                  </>
-              }
-            </div>
+            <UsernameContainer {...{formData,setFormData}} />
+            { currentUser.role === "Admin" && (
+              <div className="mb-4">
+                <label className="block text-gray-300 mb-1">Job Description</label>
+                <input
+                  type="text"
+                  placeholder="Enter a Description"
+                  className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
+                  disabled={false}
+                  onChange={(e)=>setAdminFormData(v => ({...v,jobDescription : e.target.value}))}
+                  value={adminFormData.jobDescription || "" }
+                />
+                <label className="block text-gray-300 mb-1">Company/Organization</label>
+                <input
+                  type="text"
+                  placeholder="Enter an Company/Organization"
+                  className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
+                  disabled={false}
+                  onChange={(e)=>setAdminFormData(v => ({...v,company : e.target.value}))}
+                  value={adminFormData.company || "" }
+                />
+                <label className="block text-gray-300 mb-1">Education</label>
+                <input
+                  type="text"
+                  placeholder="Enter an Education"
+                  className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
+                  disabled={false}
+                  onChange={(e)=>setAdminFormData(v => ({...v,education : e.target.value}))}
+                  value={adminFormData.education || "" }
+                />
+                <label className="block text-gray-300 mb-1">Skills/Technologies</label>
+                <input
+                  type="text"
+                  placeholder="Enter skills"
+                  className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
+                  disabled={false}
+                  onChange={(e)=>setAdminFormData(v => ({...v,skills : e.target.value}))}
+                  value={adminFormData.skills || "" }
+                />
+                <label className="block text-gray-300 mb-1">Biography</label>
+                <textarea  ></textarea>
+              </div>      
+            ) }
           </div>
-
           {/* Admin-only "Create a New Post" Button */}
           {currentUser.role === "Admin" && (
             <div className="mt-4 text-center">
