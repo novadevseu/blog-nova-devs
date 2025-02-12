@@ -9,6 +9,7 @@ import { editUserData } from "@/services/auth/editUserHook";
 import NameContainer from "./NameContainer";
 import UsernameContainer from "./UsernameContainer";
 import AdminContainer from "./AdminContainer";
+import ProfilePictureContainer from "./ProfilePictureContainer";
 
 /**
  * The Profile component relies on Redux and our prebuilt services,
@@ -83,21 +84,7 @@ const Profile: React.FC = () => {
               Profile Settings
             </h3>
             {/* Profile Picture */}
-            <div className="flex items-center mb-4">
-              <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-500">
-                <img
-                  src={currentUser.img || "https://placehold.co/600x400"}
-                  alt="Profile Picture"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <button
-                className="ml-4 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                // Placeholder: update picture functionality is not implemented.
-              >
-                Update Picture
-              </button>
-            </div>
+            <ProfilePictureContainer />
             {/* Display Name */}
             <NameContainer {...{ formData, setFormData }} />
             {/* Email Notifications Toggle */}

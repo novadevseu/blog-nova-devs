@@ -18,20 +18,20 @@ function AdminContainer() {
   const currentUser = useUser();
   const dispatch = useDispatch();
 
-  useEffect(()=>{
-    if(currentUser)
+  useEffect(() => {
+    if (currentUser)
       setAdminFormData({
-        bio : currentUser?.bio || "",
-        company : currentUser?.company || "",
-        education : currentUser?.education || "",
-        jobDescription : currentUser?.jobDescription || "",
-        skills : currentUser?.skills || ""
+        bio: currentUser?.bio || "",
+        company: currentUser?.company || "",
+        education: currentUser?.education || "",
+        jobDescription: currentUser?.jobDescription || "",
+        skills: currentUser?.skills || "",
       });
-  },[currentUser])
+  }, [currentUser]);
 
   const handleSaveAdminValues = async () => {
-    if(currentUser && currentUser.role === "Admin")
-      await editUserData(dispatch,{...adminFormData});
+    if (currentUser && currentUser.role === "Admin")
+      await editUserData(dispatch, { ...adminFormData });
   };
 
   if (currentUser)
@@ -63,11 +63,11 @@ function AdminContainer() {
                 setEdit(false);
                 setAdminFormData((v) => ({
                   ...v,
-                  bio : currentUser?.bio || "",
-                  company : currentUser?.company || "",
-                  education : currentUser.education || "",
-                  jobDescription : currentUser?.jobDescription || "",
-                  skills : currentUser?.skills || ""
+                  bio: currentUser?.bio || "",
+                  company: currentUser?.company || "",
+                  education: currentUser.education || "",
+                  jobDescription: currentUser?.jobDescription || "",
+                  skills: currentUser?.skills || "",
                 }));
               }}
               className="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
