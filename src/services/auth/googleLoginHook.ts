@@ -1,12 +1,14 @@
 // services/auth/googleLoginHook.ts
-import { loginWithGoogle, getOrCreateUserDocument } from "./firebaseAuthService";
+import {
+  loginWithGoogle,
+  getOrCreateUserDocument,
+} from "./firebaseAuthService";
 import { setUser } from "@/redux/slices/userSlice";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useDispatch } from "react-redux";
-import { UserType } from "@/types/UserType";
 
 interface GoogleLoginProps {
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  setError: React.Dispatch<React.SetStateAction<string>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   router: AppRouterInstance;
   dispatch: ReturnType<typeof useDispatch>;
@@ -31,7 +33,10 @@ export const googleLoginHook = async ({
     // Inicia sesión con Google
     const user = await loginWithGoogle();
     // Obtiene (o crea) el documento del usuario en Firestore
-    const userData = await getOrCreateUserDocument({ uid: user.uid, email: user.email });
+    const userData = await getOrCreateUserDocument({
+      uid: user.uid,
+      email: user.email,
+    });
     // Actualiza Redux
     dispatch(setUser(userData));
     // Guarda el uid en localStorage (opcional)

@@ -59,10 +59,7 @@ const Archive: React.FC = () => {
           {posts.map((post) => (
             <li key={post.id} className="p-4 ">
               <Link href={`/posts/${post.id}`}>
-                
-                  {post.title} {" "}
-                
-                By: {post.author} Created on:{" "}
+                {post.title} By: {post.author} Created on:{" "}
                 {new Date(
                   (post.timestamp?.seconds ?? 0) * 1000
                 ).toLocaleString()}

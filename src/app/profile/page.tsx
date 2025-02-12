@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { editUserData } from "@/services/auth/editUserHook";
 import NameContainer from "./NameContainer";
 import UsernameContainer from "./UsernameContainer";
+import AdminContainer from "./AdminContainer";
 
 /**
  * The Profile component relies on Redux and our prebuilt services,
@@ -21,27 +22,20 @@ const Profile: React.FC = () => {
   const currentUser = useUser();
 
   // contains current input datas in email, username
-  const [formData,setFormData] = useState({
-    fullName : "",
-    username : "",
-  })
-
-  const [adminFormData,setAdminFormData] = useState({
-    jobDescription : "",
-    company : "",
-    education : "",
-    skills : ""
-  })
+  const [formData, setFormData] = useState({
+    fullName: "",
+    username: "",
+  });
 
   // fetch the user details to the form data
-  useEffect(()=>{
-    if(currentUser){
+  useEffect(() => {
+    if (currentUser) {
       setFormData({
-        fullName : currentUser.fullName,
-        username : currentUser.username
-      })
+        fullName: currentUser.fullName,
+        username: currentUser.username,
+      });
     }
-  },[currentUser])
+  }, [currentUser]);
 
   // If no user is logged in, display an authentication prompt.
   if (!currentUser) {
@@ -71,11 +65,12 @@ const Profile: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-transparent">
-      
       <div className=" flex flex-col items-center justify-center py-10">
         {/* Main Profile Card */}
         <div className=" bg-[#0c122a] p-6 rounded-lg w-full max-w-4xl  ">
-          <h2 className="text-2xl font-semibold text-center mb-6 text-white">Profile</h2>
+          <h2 className="text-2xl font-semibold text-center mb-6 text-white">
+            Profile
+          </h2>
           <div className="text-center mb-6">
             <p className="text-sm text-gray-300">
               <strong>Email:</strong> {currentUser.email}
@@ -84,7 +79,9 @@ const Profile: React.FC = () => {
 
           {/* Profile Settings Section (placeholders, non-functional) */}
           <div className="mt-8 bg-transparent p-4 border border-gray-700 rounded-lg">
-            <h3 className="text-xl font-semibold mb-4 text-white">Profile Settings</h3>
+            <h3 className="text-xl font-semibold mb-4 text-white">
+              Profile Settings
+            </h3>
             {/* Profile Picture */}
             <div className="flex items-center mb-4">
               <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-500">
@@ -102,10 +99,12 @@ const Profile: React.FC = () => {
               </button>
             </div>
             {/* Display Name */}
-            <NameContainer {...{formData,setFormData}} />
+            <NameContainer {...{ formData, setFormData }} />
             {/* Email Notifications Toggle */}
             <div className="mb-4 flex items-center">
-              <label className="block text-gray-300 mr-4">Email Notifications</label>
+              <label className="block text-gray-300 mr-4">
+                Email Notifications
+              </label>
               <div className="w-6 h-6 flex items-center justify-center bg-green-600 rounded-full">
                 <svg
                   className="w-4 h-4 text-white"
@@ -134,49 +133,10 @@ const Profile: React.FC = () => {
               </button>
             </div>
             {/* Update Username */}
-            <UsernameContainer {...{formData,setFormData}} />
-            { currentUser.role === "Admin" && (
-              <div className="mb-4">
-                <label className="block text-gray-300 mb-1">Job Description</label>
-                <input
-                  type="text"
-                  placeholder="Enter a Description"
-                  className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
-                  disabled={false}
-                  onChange={(e)=>setAdminFormData(v => ({...v,jobDescription : e.target.value}))}
-                  value={adminFormData.jobDescription || "" }
-                />
-                <label className="block text-gray-300 mb-1">Company/Organization</label>
-                <input
-                  type="text"
-                  placeholder="Enter an Company/Organization"
-                  className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
-                  disabled={false}
-                  onChange={(e)=>setAdminFormData(v => ({...v,company : e.target.value}))}
-                  value={adminFormData.company || "" }
-                />
-                <label className="block text-gray-300 mb-1">Education</label>
-                <input
-                  type="text"
-                  placeholder="Enter an Education"
-                  className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
-                  disabled={false}
-                  onChange={(e)=>setAdminFormData(v => ({...v,education : e.target.value}))}
-                  value={adminFormData.education || "" }
-                />
-                <label className="block text-gray-300 mb-1">Skills/Technologies</label>
-                <input
-                  type="text"
-                  placeholder="Enter skills"
-                  className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
-                  disabled={false}
-                  onChange={(e)=>setAdminFormData(v => ({...v,skills : e.target.value}))}
-                  value={adminFormData.skills || "" }
-                />
-                <label className="block text-gray-300 mb-1">Biography</label>
-                <textarea  ></textarea>
-              </div>      
-            ) }
+            <UsernameContainer {...{ formData, setFormData }} />
+            {currentUser.role === "Admin" && (
+              <AdminContainer />
+            )}
           </div>
           {/* Admin-only "Create a New Post" Button */}
           {currentUser.role === "Admin" && (

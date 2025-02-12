@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 interface LoginHookProps {
   e: React.FormEvent;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  setError: React.Dispatch<React.SetStateAction<string>>;
   email: string;
   password: string;
   router: AppRouterInstance;

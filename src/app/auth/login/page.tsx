@@ -12,7 +12,7 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
 
   // Obtiene el usuario actual del estado global (Redux) mediante un custom hook
   const currentUser = useUser();

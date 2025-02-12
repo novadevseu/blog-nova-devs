@@ -7,7 +7,15 @@ import {
   createUserWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
 import { UserType } from "@/redux/slices/userSlice";
 import { AppDispatch } from "@/redux/store"; // import your AppDispatch type
 import { setUserNull } from "@/redux/slices/userSlice";
@@ -19,7 +27,11 @@ import { setUserNull } from "@/redux/slices/userSlice";
  * @returns The authenticated user.
  */
 export const loginWithEmail = async (email: string, password: string) => {
-  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
   return userCredential.user;
 };
 
@@ -40,7 +52,11 @@ export const loginWithGoogle = async () => {
  * @returns The created user.
  */
 export const signUpWithEmail = async (email: string, password: string) => {
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
   return userCredential.user;
 };
 
@@ -49,7 +65,10 @@ export const signUpWithEmail = async (email: string, password: string) => {
  * @param user An object containing the user's uid and email.
  * @returns The user's data from Firestore.
  */
-export const getOrCreateUserDocument = async (user: { uid: string; email: string | null }): Promise<UserType> => {
+export const getOrCreateUserDocument = async (user: {
+  uid: string;
+  email: string | null;
+}): Promise<UserType> => {
   const userDocRef = doc(db, "users", user.uid);
   const userDoc = await getDoc(userDocRef);
 
@@ -59,10 +78,10 @@ export const getOrCreateUserDocument = async (user: { uid: string; email: string
       uid: user.uid,
       email: user.email || "",
       role: "Viewer",
-      fullName : "",
-      img : "",
-      profile : "",
-      username : ""
+      fullName: "",
+      img: "",
+      profile: "",
+      username: "",
     };
     await setDoc(userDocRef, {
       ...newUser,
@@ -74,28 +93,33 @@ export const getOrCreateUserDocument = async (user: { uid: string; email: string
   }
 };
 
-export const getUserDocumentByEmail = async (email: string): Promise<UserType | null> => {
+export const getUserDocumentByEmail = async (
+  email: string
+): Promise<UserType | null> => {
   if (!email) return null;
 
   try {
-    const usersQuery = query(collection(db, "users"), where("email", "==", email));
+    const usersQuery = query(
+      collection(db, "users"),
+      where("email", "==", email)
+    );
     const querySnapshot = await getDocs(usersQuery);
 
     if (querySnapshot.empty) {
       return null;
     }
 
-    const userDoc = querySnapshot.docs[0]; 
-    const userData = userDoc.data()
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data();
 
     return {
-      email : userData.email,
-      username : userData.username,
-      fullName : userData.fullName,
-      img : userData.img,
-      profile : userData.profile,
-      role : userData.role,
-      uid : userData.uid
+      email: userData.email,
+      username: userData.username,
+      fullName: userData.fullName,
+      img: userData.img,
+      profile: userData.profile,
+      role: userData.role,
+      uid: userData.uid,
     } as UserType;
   } catch (error) {
     console.error("Error fetching user by email:", error);

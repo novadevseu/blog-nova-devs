@@ -8,10 +8,15 @@ export interface UserType {
   uid: string;
   email: string;
   role: string;
-  username : string;
-  img : string;
-  fullName : string;
-  profile : string;
+  username: string;
+  img: string;
+  fullName: string;
+  profile: string;
+  jobDescription?: string;
+  company?: string;
+  education?: string;
+  skills?: string;
+  bio?: string;
 }
 
 interface UserState {

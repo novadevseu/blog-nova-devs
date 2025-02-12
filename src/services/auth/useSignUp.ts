@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 interface SignUpProps {
   email: string;
   password: string;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  setError: React.Dispatch<React.SetStateAction<string>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   dispatch: ReturnType<typeof useDispatch>;
 }
@@ -25,7 +25,7 @@ export const useSignUp = async ({
   dispatch,
 }: SignUpProps) => {
   setLoading(true);
-  setError(null);
+  setError("");
 
   try {
     // Crea un nuevo usuario con email y contraseña
