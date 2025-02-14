@@ -21,7 +21,7 @@ yarn install
 pnpm install
 ```
 
-Create a `.env.local` file in the root of the project and add the following environment variables:
+Create a `.env` file in the root of the project and add the following environment variables:
 
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
@@ -66,7 +66,7 @@ We use the `react-markdown` library to render Markdown content within our React 
 
 ## Firebase Integration
 
-Firebase is used for authentication and data management in this project. We utilize Firebase Authentication to handle user sign-up, login, and logout functionalities. Firebase Firestore is used to store and retrieve blog posts and comments. The environment variables required for Firebase configuration are specified in the `.env.local` file.
+Firebase is used for authentication and data management in this project. We utilize Firebase Authentication to handle user sign-up, login, and logout functionalities. Firebase Firestore is used to store and retrieve blog posts and comments. The environment variables required for Firebase configuration are specified in the `.env` file.
 
 ## Learn More
 
