@@ -2,7 +2,7 @@
 import {
   loginWithGoogle,
   getOrCreateUserDocument,
-} from "./firebaseAuthService";
+} from "../services/auth/firebaseAuthService";
 import { setUser } from "@/redux/slices/userSlice";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useDispatch } from "react-redux";
@@ -39,8 +39,7 @@ export const googleLoginHook = async ({
     });
     // Actualiza Redux
     dispatch(setUser(userData));
-    // Guarda el uid en localStorage (opcional)
-    localStorage.setItem("uid", userData.uid);
+    
     // Redirige al perfil
     router.push("/profile");
   } catch (error: any) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/hooks/useUser";
-import { editUserData } from "@/services/auth/editUserHook";
+import { editUserData } from "@/hooks/editUserHook";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 

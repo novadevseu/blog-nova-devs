@@ -1,5 +1,5 @@
 // services/auth/loginHook.ts
-import { loginWithEmail, getOrCreateUserDocument } from "./firebaseAuthService";
+import { loginWithEmail, getOrCreateUserDocument } from "../services/auth/firebaseAuthService";
 import { setUser } from "@/redux/slices/userSlice";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useDispatch } from "react-redux";
@@ -44,8 +44,7 @@ export const loginHook = async ({
     const userData = await getOrCreateUserDocument({ uid: user.uid, email: user.email });
     // Actualiza el estado global (Redux)
     dispatch(setUser(userData));
-    // Guarda el uid en localStorage (opcional)
-    localStorage.setItem("uid", userData.uid);
+   
     // Limpia los campos del formulario
     setEmail("");
     setPassword("");

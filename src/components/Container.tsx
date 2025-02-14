@@ -1,8 +1,6 @@
 // components/Container.tsx
 "use client";
-import React, { useEffect, useState, ReactNode } from "react";
-import { useDispatch } from "react-redux";
-import { getUserData } from "@/services/auth/getUserHook";
+import React, {ReactNode } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
@@ -16,17 +14,11 @@ interface ContainerProps {
  * - Muestra el Navbar, el contenido y el Footer.
  */
 const Container: React.FC<ContainerProps> = ({ children }) => {
-  const [isReady, setIsReady] = useState(false);
-  const dispatch = useDispatch();
 
-  useEffect(() => {
-    (async () => {
-      await getUserData(dispatch);
-      setIsReady(true);
-    })();
-  }, [dispatch]);
 
-  if (!isReady) return <div>Loading...</div>;
+
+
+
 
   return (
     <div>

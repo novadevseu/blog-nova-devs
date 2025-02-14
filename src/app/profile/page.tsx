@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { logoutUser } from "@/services/auth/firebaseAuthService";
 import { useDispatch } from "react-redux";
-import { editUserData } from "@/services/auth/editUserHook";
 import NameContainer from "./NameContainer";
 import UsernameContainer from "./UsernameContainer";
 import AdminContainer from "./AdminContainer";

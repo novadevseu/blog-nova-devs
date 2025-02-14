@@ -1,13 +1,13 @@
-// pages/auth/signup.tsx
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSignUp } from "@/services/auth/useSignUp";
 import { useDispatch } from "react-redux";
-import { googleLoginHook } from "@/services/auth/googleLoginHook";
+import { googleLoginHook } from "@/hooks/googleLoginHook";
+import { githubLoginHook } from "@/hooks/githubLoginHook";
+import { yahooLoginHook } from "@/hooks/yahooLoginHook";
 
 const SignUpPage: React.FC = () => {
-  // Estados locales para email, contraseña, carga y errores
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,6 @@ const SignUpPage: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  // Maneja el registro usando email y contraseña
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     await useSignUp({
@@ -25,26 +24,42 @@ const SignUpPage: React.FC = () => {
       setLoading,
       dispatch,
     });
-    // Si el registro es exitoso, redirige al perfil
     if (!error) {
       router.push("/profile");
     }
   };
 
-  // (Opcional) Puedes implementar un handler para Google similar al login
   const handleGoogleSignIn = async () => {
     await googleLoginHook({
-          setError,
-          setLoading,
-          router,
-          dispatch,
-        });
+      setError,
+      setLoading,
+      router,
+      dispatch,
+    });
+  };
+
+  const handleGithubSignIn = async () => {
+    await githubLoginHook({
+      setError,
+      setLoading,
+      router,
+      dispatch,
+    });
+  };
+
+  const handleYahooSignIn = async () => {
+    await yahooLoginHook({
+      setError,
+      setLoading,
+      router,
+      dispatch,
+    });
   };
 
   const providers = [
     { name: "Google", color: "hover:border-gray-500 bg-white", icon: "/google.svg", action: handleGoogleSignIn },
-    { name: "Facebook", color: "border-blue-600 hover:border-blue-800 bg-[#0269e3]", icon: "/facebook.svg", action: handleGoogleSignIn },
-    { name: "Apple", color: "border-black hover:border-gray-900 bg-black", icon: "/apple.svg", action: handleGoogleSignIn },
+    { name: "GitHub", color: "hover:border-gray-500 bg-white", icon: "/github.svg", action: handleGithubSignIn },
+    { name: "Yahoo", color: "hover:border-gray-500 bg-white", icon: "/yahoo.svg", action: handleYahooSignIn },
   ];
 
   return (
@@ -87,7 +102,9 @@ const SignUpPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 text-white"}`}
+              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${
+                loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 text-white"
+              }`}
             >
               {loading ? "Registering..." : "Sign Up"}
             </button>
@@ -105,7 +122,9 @@ const SignUpPage: React.FC = () => {
                 key={provider.name}
                 onClick={provider.action}
                 disabled={loading}
-                className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${loading ? "bg-gray-400 cursor-not-allowed" : `text-white border-2 ${provider.color}`}`}
+                className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${
+                  loading ? "bg-gray-400 cursor-not-allowed" : `text-white border-2 ${provider.color}`
+                }`}
               >
                 {loading ? "Loading..." : <img src={provider.icon} alt={provider.name} className="w-7 h-7" />}
               </button>
