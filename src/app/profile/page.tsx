@@ -9,6 +9,8 @@ import NameContainer from "./NameContainer";
 import UsernameContainer from "./UsernameContainer";
 import AdminContainer from "./AdminContainer";
 import ProfilePictureContainer from "./ProfilePictureContainer";
+import { getUserSession } from "@/services/auth/sessions";
+
 
 /**
  * The Profile component relies on Redux and our prebuilt services,
