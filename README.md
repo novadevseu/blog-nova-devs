@@ -1,4 +1,4 @@
-# Nova Devs Blog 🚀
+# JavaScript & Chill 🚀
 
 This is an **Open Source** blogging platform built with **Next.js**, **Firebase**, and **Tailwind CSS**. Nova Devs has designed this project to offer an intuitive and efficient way to create, edit, and manage articles with Markdown, including images and rich formatting. 📝🖼️
 
