@@ -103,11 +103,11 @@ This project relies on the following key dependencies:
 
 Deploying this app is seamless with [Vercel](https://vercel.com/), the creators of Next.js.
 
-Check out our [deployment guide](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Check out the [deployment guide](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 ## 🎉 Open Source Commitment
 
-Nova Devs Blog is **fully open source**, meaning anyone can clone, modify, and use it however they wish. 
+CoffeScript & Chill is **fully open source**, meaning anyone can clone, modify, and use it however they wish. 
 
 Our goal is not just to provide a great platform, but also to **actively use it** ourselves. We plan to build a community-driven blog where **we and our users** contribute articles on topics like **technology, AI, and current trends**. 
 
