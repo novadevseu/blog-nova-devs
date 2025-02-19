@@ -19,6 +19,7 @@ import {
 import { UserType } from "@/redux/slices/userSlice";
 import { AppDispatch } from "@/redux/store"; // import your AppDispatch type
 import { setUserNull } from "@/redux/slices/userSlice";
+import { getAuth, sendPasswordResetEmail, confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth";
 
 /**
  * Logs in a user with email and password using Firebase Authentication.
@@ -139,3 +140,50 @@ export const logoutUser = async (dispatch: AppDispatch): Promise<boolean> => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return true;
 };
+
+/**
+ * Sends a password reset email to the user.
+ * @param email The user's email.
+ * @returns A promise that resolves when the email is sent.
+ */
+export const sendResetPasswordEmail = async (email: string): Promise<void> => {
+  const auth = getAuth();
+  try {
+    await sendPasswordResetEmail(auth, email);
+    console.log("Password reset email sent successfully.");
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+  }
+};
+
+/**
+ * Verifies the password reset code from the email link.
+ * @param oobCode The action code from the reset link.
+ * @returns A promise that resolves with the user's email if valid.
+ */
+export const verifyResetCode = async (oobCode: string): Promise<string | null> => {
+  const auth = getAuth();
+  try {
+    return await verifyPasswordResetCode(auth, oobCode);
+  } catch (error) {
+    console.error("Invalid or expired reset code:", error);
+    return null;
+  }
+};
+
+/**
+ * Resets the user's password using the reset code.
+ * @param oobCode The action code from the reset link.
+ * @param newPassword The new password chosen by the user.
+ * @returns A promise that resolves when the password is successfully reset.
+ */
+export const resetPassword = async (oobCode: string, newPassword: string): Promise<void> => {
+  const auth = getAuth();
+  try {
+    await confirmPasswordReset(auth, oobCode, newPassword);
+    console.log("Password has been reset successfully.");
+  } catch (error) {
+    console.error("Error resetting password:", error);
+  }
+};
+
