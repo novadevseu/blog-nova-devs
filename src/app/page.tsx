@@ -83,10 +83,12 @@ const HomePage: React.FC = () => {
   const sidebarLinks = [
     { name: "Home", href: "/" },
     { name: "About Us", href: "/about" },
-    { name: "Guides", href: "/guides" },
-    { name: "Contact", href: "/contact" },
-    { name: "Our Website", href: "https://example.com" },
+    { name: "Archive", href: "/archive" },
+    { name: "LinkedIn", href: "https://www.linkedin.com/company/nova-devs-eu/" },
+    { name: "GitHub", href: "https://github.com/novadevseu" },
+    { name: "Our Website", href: "https://your-portfolio.com" }, // Replace with real portfolio URL
   ];
+  
 
   // Function to scroll to top
   const scrollToTop = () => {
