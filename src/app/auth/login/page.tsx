@@ -164,11 +164,10 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${
-                loading
+              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${loading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-indigo-600 hover:bg-indigo-700 text-white"
-              }`}
+                }`}
             >
               {loading ? "Logging in..." : "Log In"}
             </button>
@@ -186,11 +185,10 @@ const LoginPage: React.FC = () => {
                 key={provider.name}
                 onClick={provider.action}
                 disabled={loading}
-                className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${
-                  loading
+                className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${loading
                     ? "bg-gray-400 cursor-not-allowed"
                     : `text-white border-2 ${provider.color}`
-                }`}
+                  }`}
               >
                 {loading ? (
                   "Loading..."
@@ -265,11 +263,10 @@ const LoginPage: React.FC = () => {
               <button
                 onClick={handleSendResetEmail}
                 disabled={resetLoading || !resetEmail}
-                className={`px-4 py-2 rounded text-sm font-medium ${
-                  resetLoading
+                className={`px-4 py-2 rounded text-sm font-medium ${resetLoading
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700 text-white"
-                }`}
+                  }`}
               >
                 {resetLoading ? "Sending..." : "Send Reset Email"}
               </button>

@@ -88,7 +88,7 @@ const HomePage: React.FC = () => {
     { name: "GitHub", href: "https://github.com/novadevseu" },
     { name: "Our Website", href: "https://your-portfolio.com" }, // Replace with real portfolio URL
   ];
-  
+
 
   // Function to scroll to top
   const scrollToTop = () => {
@@ -96,15 +96,15 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    
+
     <div className="min-h-screen">
       {/* Banner Section */}
       <h2
-          className=" font-semibold text-center font-sans mb-8 border-t-2 border-b-2 border-white"
-          id="title"
-        >
-          Coffee<span style={{ color: "#E0C600" }}>Script</span> & Chill
-        </h2>
+        className=" font-semibold text-center font-sans mb-8 border-t-2 border-b-2 border-white"
+        id="title"
+      >
+        Coffee<span style={{ color: "#E0C600" }}>Script</span> & Chill
+      </h2>
 
       {/* Carousel Section */}
       <LastPosts

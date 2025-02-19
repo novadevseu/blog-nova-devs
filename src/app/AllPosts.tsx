@@ -21,6 +21,7 @@ interface PostListProps {
 }
 
 const AllPosts: React.FC<PostListProps> = ({ posts, loading }) => {
+  console.log(posts)
   if (loading && posts.length === 0) {
     // Renderizamos esqueletos más vistosos para 6 cards de posts
     return (
@@ -103,6 +104,11 @@ const AllPosts: React.FC<PostListProps> = ({ posts, loading }) => {
                   {category}
                 </span>
               ))}
+            </div>
+            <div>
+              <span className="text-sm text-gray-500 mt-4 inline-block">
+                by {post.author || "Unknown"}{" "}
+              </span>
             </div>
             <Link href={`/posts/${post.id}`}>
               <span className="text-sm text-blue-500 mt-4 cursor-pointer inline-block">

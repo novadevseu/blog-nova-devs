@@ -1,9 +1,11 @@
 // redux/store.ts
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./slices/userSlice";
+// TODO Cambiar UserType de archivo
+import userReducer, { setUser, UserType } from "./slices/userSlice";
+import { getCookie } from "@/utils/cookies";
 
 export const makeStore = () => {
-  return configureStore({
+  const store = configureStore({
     reducer: {
       currentUser: userReducer,
     },
@@ -16,6 +18,14 @@ export const makeStore = () => {
         },
       }),
   });
+
+  // Restaurar el estado del usuario desde las cookies
+  const userCookie = getCookie("user");
+  if (userCookie) {
+    store.dispatch(setUser(JSON.parse(userCookie) as UserType));
+  }
+
+  return store;
 };
 
 export type AppStore = ReturnType<typeof makeStore>;
