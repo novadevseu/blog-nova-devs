@@ -10,14 +10,22 @@
   },
   "dependencies": {
     "@firebase/firestore": "^4.7.6",
+    "@reduxjs/toolkit": "^2.5.1",
     "@uiw/react-md-editor": "^4.0.5",
     "firebase": "^11.2.0",
+    "install": "^0.13.0",
+    "iron-session": "^8.0.4",
     "next": "15.1.6",
     "react": "^19.0.0",
+    "react-comments-section": "^3.2.0",
     "react-dom": "^19.0.0",
     "react-firebase-hooks": "^5.1.1",
+    "react-loading-skeleton": "^3.5.0",
     "react-markdown": "^9.0.3",
-    "remark-gfm": "^4.0.0"
+    "react-redux": "^9.2.0",
+    "react-responsive-carousel": "^3.2.23",
+    "remark-gfm": "^4.0.0",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

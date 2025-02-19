@@ -2,184 +2,158 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { collection, doc, getDoc, addDoc } from "firebase/firestore";
-import { auth, db } from "../config/firebase-config";
-import Navbar from "../components/Navbar";
-import dynamic from "next/dynamic";
+import { useUser } from "@/hooks/useUser";
+import { logoutUser } from "@/services/auth/firebaseAuthService";
+import { useDispatch } from "react-redux";
+import NameContainer from "./NameContainer";
+import UsernameContainer from "./UsernameContainer";
+import AdminContainer from "./AdminContainer";
+import ProfilePictureContainer from "./ProfilePictureContainer";
+import UserComments from "./UserComments";
 
-// Cargar el editor dinámicamente para evitar problemas con SSR
-const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
-
+/**
+ * The Profile component relies on Redux and our prebuilt services,
+ * so it does not contain any direct Firebase logic.
+ */
 const Profile: React.FC = () => {
-  const [user, setUser] = useState<null | { email: string; role: string }>(null);
-  const [loading, setLoading] = useState(true);
-  const [title, setTitle] = useState("");
-  const [shortDescription, setShortDescription] = useState(""); // Nuevo campo
-  const [content, setContent] = useState<string | undefined>(""); // Ajustar para MDEditor
-  const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
+  const dispatch = useDispatch();
 
+  // Get the current user from Redux using our custom hook.
+  const currentUser = useUser();
+
+  // contains current input datas in email, username
+  const [formData, setFormData] = useState({
+    fullName: "",
+    username: "",
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // fetch the user details to the form data
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        try {
-          const userDocRef = doc(db, "users", currentUser.uid);
-          const userDoc = await getDoc(userDocRef);
-
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setUser({
-              email: userData.email as string,
-              role: userData.role as string,
-            });
-          } else {
-            setUser(null);
-          }
-        } catch (error) {
-          console.error("Error al cargar los datos del usuario:", error);
-          setUser(null);
-        }
-      } else {
-        setUser(null);
-       
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [router]);
-
-  const handleCreatePost = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title || !shortDescription || !content) return;
-
-    try {
-      await addDoc(collection(db, "posts"), {
-        title,
-        shortDescription,
-        content,
-        timestamp: new Date(),
+    if (currentUser) {
+      setFormData({
+        fullName: currentUser.fullName,
+        username: currentUser.username,
       });
-
-      setTitle("");
-      setShortDescription("");
-      setContent("");
-      setSuccessMessage("¡Post creado con éxito!");
-      setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (error) {
-      console.error("Error al crear el post:", error);
     }
-  };
+  }, [currentUser]);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    router.push("/login");
-  };
-
-  if (loading) {
+  // If no user is logged in, display an authentication prompt.
+  if (!currentUser) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Cargando...</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-transparent">
+        <p className="mb-4 text-gray-300">You are not authenticated.</p>
+        <button
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          onClick={() => router.push("/auth/login")}
+        >
+          Log In
+        </button>
       </div>
     );
   }
 
-  if (!user) {
-    return (
-        <div className="flex flex-col min-h-screen">
-      {/* Navbar */}
-      <header>
-        <Navbar />
-      </header>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        
-        <p className="mb-4 text-gray-700">No estás autenticado.</p>
-        <button
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-          onClick={() => router.push("/login")}
-        >
-          Iniciar sesión
-        </button>
-      </div> </div>
-    );
-  }
+  // Logout handler using our service method.
+  const handleLogout = async () => {
+    try {
+      await logoutUser(dispatch);
+      router.push("/auth/login");
+    } catch (error) {
+      console.error("Failed to log out:", error);
+      // Optionally, display an error message to the user.
+    }
+  };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Navbar */}
-      <header>
-        <Navbar />
-      </header>
-
-      {/* Main Content */}
-      <div className="flex flex-1 items-center justify-center bg-gray-100">
-        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
-          <h2 className="text-xl font-semibold text-center mb-4">Perfil</h2>
+    <div className="min-h-screen bg-transparent">
+      <div className=" flex flex-col items-center justify-center py-10">
+        {/* Main Profile Card */}
+        <div className="p-4">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Show Comments
+          </button>
+          <UserComments
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
+        </div>
+        <div className=" bg-[#0c122a] p-6 rounded-lg w-full max-w-4xl  ">
+          <h2 className="text-2xl font-semibold text-center mb-6 text-white">
+            Profile
+          </h2>
           <div className="text-center mb-6">
-            <p className="text-sm text-gray-700">
-              <strong>Correo:</strong> {user.email}
-            </p>
-            <p className="text-sm text-gray-700">
-              <strong>Rol:</strong> {user.role}
+            <p className="text-sm text-gray-300">
+              <strong>Email:</strong> {currentUser.email}
             </p>
           </div>
 
-          {/* Mostrar formulario si el rol es Admin */}
-          {user.role === "Admin" && (
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Crear Post</h3>
-              <form onSubmit={handleCreatePost} className="space-y-4">
-                <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                    Título
-                  </label>
-                  <input
-                    type="text"
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="shortDescription" className="block text-sm font-medium text-gray-700">
-                    Descripción Corta
-                  </label>
-                  <input
-                    type="text"
-                    id="shortDescription"
-                    value={shortDescription}
-                    onChange={(e) => setShortDescription(e.target.value)}
-                    required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="content" className="block text-sm font-medium text-gray-700">
-                    Contenido
-                  </label>
-                  <MDEditor value={content} onChange={setContent} height={500} />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full py-2 px-4 bg-indigo-600 text-white font-medium rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          {/* Profile Settings Section (placeholders, non-functional) */}
+          <div className="mt-8 bg-transparent p-4 border border-gray-700 rounded-lg">
+            <h3 className="text-xl font-semibold mb-4 text-white">
+              Profile Settings
+            </h3>
+            {/* Profile Picture */}
+            <ProfilePictureContainer />
+            {/* Display Name */}
+            <NameContainer {...{ formData, setFormData }} />
+            {/* Email Notifications Toggle */}
+            <div className="mb-4 flex items-center">
+              <label className="block text-gray-300 mr-4">
+                Email Notifications
+              </label>
+              <div className="w-6 h-6 flex items-center justify-center bg-green-600 rounded-full">
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  Crear Post
-                </button>
-              </form>
-              {successMessage && (
-                <p className="text-green-500 text-sm mt-4">{successMessage}</p>
-              )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="3"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              {/* This toggle is only visual and non-functional. */}
+            </div>
+            {/* Reset Password */}
+            <div className="mb-4">
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                // Placeholder: reset password functionality is not implemented.
+              >
+                Reset Password
+              </button>
+            </div>
+            {/* Update Username */}
+            <UsernameContainer {...{ formData, setFormData }} />
+            {currentUser.role === "Admin" && <AdminContainer />}
+          </div>
+          {/* Admin-only "Create a New Post" Button */}
+          {currentUser.role === "Admin" && (
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => router.push("/create-post")}
+                className="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-green-700 transition duration-300"
+              >
+                Create a New Post
+              </button>
             </div>
           )}
 
+          {/* Logout Button */}
           <button
             onClick={handleLogout}
-            className="mt-6 w-full py-2 px-4 bg-red-600 text-white font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            className="mt-6 w-full py-2 px-4 bg-red-600 text-white font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none"
           >
-            Cerrar sesión
+            Log Out
           </button>
         </div>
       </div>
