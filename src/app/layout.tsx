@@ -7,13 +7,13 @@ import "./globals.css";
 
 // Define the metadata used for SEO in Next.js
 export const metadata: Metadata = {
-  title: "CoffeeScript & Chill - Nova Devs",
+  title: "CoffeeScript & Chill",
   description:
     "Stay updated with the latest tech articles, guides, and insights. CoffeeScript & Chill, powered by Nova Devs.",
   keywords:
     "CoffeeScript, programming, JavaScript, web development, tech blog, Nova Devs, guides",
   openGraph: {
-    title: "CoffeeScript & Chill - Nova Devs",
+    title: "CoffeeScript & Chill",
     description:
       "Stay updated with the latest tech articles, guides, and insights. CoffeeScript & Chill, powered by Nova Devs.",
     url: "https://yourwebsite.com",
@@ -77,12 +77,26 @@ const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             }),
           }}
         />
+        {/* Favicon for browsers */}
+        <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png" />
+        <link rel="shortcut icon" href="images/favicon/favicon.ico" />
+
+        {/* Apple Touch Icon (for iOS) */}
+        <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-touch-icon.png" />
+
+        {/* Android Icons */}
+        <link rel="icon" type="image/png" sizes="192x192" href="images/favicon/android-chrome-192x192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="images/favicon/android-chrome-512x512.png" />
+
+        {/* Web Manifest for Progressive Web Apps (PWA) */}
+        <link rel="manifest" href="images/favicon/site.webmanifest" />
       </head>
       <body className="pt-2 px-10">
         <StoreProvider>
           <Container>{children}</Container>
 
-          
+
         </StoreProvider>
       </body>
     </html>
