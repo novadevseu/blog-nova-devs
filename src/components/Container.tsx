@@ -1,12 +1,13 @@
 // components/Container.tsx
 "use client";
-import React, {ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { getUserSession } from "@/services/auth/sessions";
 import { useDispatch } from "react-redux";
 import { setUser, UserType } from "@/redux/slices/userSlice";
 import getUserDataByUid from "@/hooks/getUserByUID";
+import { usePathname } from "next/navigation";
 
 interface ContainerProps {
   children: ReactNode;
@@ -18,25 +19,25 @@ interface ContainerProps {
  * - Muestra el Navbar, el contenido y el Footer.
  */
 const Container: React.FC<ContainerProps> = ({ children }) => {
-
   const dispatch = useDispatch();
+  const pathname = usePathname();
+  const [isReady,setIsReady] = useState(false);
 
-  const handleFetchUserData =  async () => {
-    console.log('naber1');
-    const { uid } = await getUserSession() as unknown as {uid : string};
-    console.log('naber2');
-    const userData = await getUserDataByUid(uid) as UserType;
-    console.log('naber3');
+  const handleFetchUserData = async () => {
+    const uid = (await getUserSession()) as string;
+    const userData = (await getUserDataByUid(uid)) as UserType;
     dispatch(setUser(userData));
-  }
+  };
 
-  useEffect(()=>{
-    console.log('hello');
-    ( async () => {
+  useEffect(() => {
+    (async () => {
       await handleFetchUserData();
-    } )();
-  },[])
+    })();
+    setIsReady(true);
+  }, [pathname]);
 
+  if (!isReady)
+    return (<div>Loading...</div>)
   return (
     <div>
       <Navbar />

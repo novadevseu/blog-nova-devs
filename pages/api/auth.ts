@@ -6,7 +6,6 @@ type SessionData = {
 };
 
 export async function get(req: NextApiRequest, res: NextApiResponse) {
-  console.log("naberrrr");
   const session = await getIronSession<SessionData>(req, res, {
     password: process.env.SESSION_SECRET || "",
     cookieName: "session_uid",

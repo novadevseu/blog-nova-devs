@@ -9,8 +9,7 @@ import NameContainer from "./NameContainer";
 import UsernameContainer from "./UsernameContainer";
 import AdminContainer from "./AdminContainer";
 import ProfilePictureContainer from "./ProfilePictureContainer";
-import { getUserSession } from "@/services/auth/sessions";
-
+import UserComments from "./UserComments";
 
 /**
  * The Profile component relies on Redux and our prebuilt services,
@@ -28,6 +27,7 @@ const Profile: React.FC = () => {
     fullName: "",
     username: "",
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // fetch the user details to the form data
   useEffect(() => {
@@ -69,6 +69,18 @@ const Profile: React.FC = () => {
     <div className="min-h-screen bg-transparent">
       <div className=" flex flex-col items-center justify-center py-10">
         {/* Main Profile Card */}
+        <div className="p-4">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Show Comments
+          </button>
+          <UserComments
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
+        </div>
         <div className=" bg-[#0c122a] p-6 rounded-lg w-full max-w-4xl  ">
           <h2 className="text-2xl font-semibold text-center mb-6 text-white">
             Profile
@@ -122,9 +134,7 @@ const Profile: React.FC = () => {
             </div>
             {/* Update Username */}
             <UsernameContainer {...{ formData, setFormData }} />
-            {currentUser.role === "Admin" && (
-              <AdminContainer />
-            )}
+            {currentUser.role === "Admin" && <AdminContainer />}
           </div>
           {/* Admin-only "Create a New Post" Button */}
           {currentUser.role === "Admin" && (

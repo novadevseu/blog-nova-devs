@@ -14,10 +14,6 @@ const Navbar: React.FC = () => {
   const pathname = usePathname(); // Get the current path
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    console.log(currentUser);
-  }, [currentUser]);
-
   const handleLogOut = async () => {
     try {
       const result = await logoutUser(dispatch);

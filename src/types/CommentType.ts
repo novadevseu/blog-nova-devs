@@ -5,4 +5,6 @@ export interface Comment {
   timestamp: { seconds: number; nanoseconds: number };
   parentCommentId : string | null;
   replies ?: Comment[];
+  postId : string;
+  post ?: any
 }

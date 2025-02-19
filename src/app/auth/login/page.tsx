@@ -13,11 +13,8 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
- 
   const router = useRouter();
   const dispatch = useDispatch();
-
-
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,9 +59,24 @@ const LoginPage: React.FC = () => {
   };
 
   const providers = [
-    { name: "Google", color: "hover:border-gray-500 bg-white", icon: "/google.svg", action: handleGoogleSignIn },
-    { name: "GitHub", color: "hover:border-gray-500 bg-white", icon: "/github.svg", action: handleGithubSignIn },
-    { name: "Yahoo", color: "hover:border-gray-500 bg-white", icon: "/yahoo.svg", action: handleYahooSignIn },
+    {
+      name: "Google",
+      color: "hover:border-gray-500 bg-white",
+      icon: "/google.svg",
+      action: handleGoogleSignIn,
+    },
+    {
+      name: "GitHub",
+      color: "hover:border-gray-500 bg-white",
+      icon: "/github.svg",
+      action: handleGithubSignIn,
+    },
+    {
+      name: "Yahoo",
+      color: "hover:border-gray-500 bg-white",
+      icon: "/yahoo.svg",
+      action: handleYahooSignIn,
+    },
   ];
 
   return (
@@ -108,7 +120,9 @@ const LoginPage: React.FC = () => {
               type="submit"
               disabled={loading}
               className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${
-                loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
               }`}
             >
               {loading ? "Logging in..." : "Log In"}
@@ -128,19 +142,35 @@ const LoginPage: React.FC = () => {
                 onClick={provider.action}
                 disabled={loading}
                 className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : `text-white border-2 ${provider.color}`
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : `text-white border-2 ${provider.color}`
                 }`}
               >
-                {loading ? "Loading..." : <img src={provider.icon} alt={provider.name} className="w-7 h-7" />}
+                {loading ? (
+                  "Loading..."
+                ) : (
+                  <img
+                    src={provider.icon}
+                    alt={provider.name}
+                    className="w-7 h-7"
+                  />
+                )}
               </button>
             ))}
           </div>
 
           <div className="mt-6 text-center text-sm text-blue-500 flex justify-between mx-7 underline">
-            <button onClick={() => router.push("/auth/signup")} className="hover:text-blue-600">
+            <button
+              onClick={() => router.push("/auth/signup")}
+              className="hover:text-blue-600"
+            >
               ¿No tienes una cuenta?
             </button>
-            <button onClick={() => router.push("/auth/forgot-password")} className="hover:text-blue-600">
+            <button
+              onClick={() => router.push("/auth/forgot-password")}
+              className="hover:text-blue-600"
+            >
               ¿Olvidaste tu contraseña?
             </button>
           </div>
