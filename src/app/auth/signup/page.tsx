@@ -24,9 +24,10 @@ const SignUpPage: React.FC = () => {
       setLoading,
       dispatch,
     });
-    if (!error) {
-      router.push("/profile");
-    }
+    console.log("Error to signup: ", error)
+    // if (!error) {
+    //   router.push("/profile");
+    // }
   };
 
   const handleGoogleSignIn = async () => {
@@ -78,7 +79,7 @@ const SignUpPage: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="text-black mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
             <div>
@@ -91,7 +92,7 @@ const SignUpPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="mt-1 mb-3 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="text-black mt-1 mb-3 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
             {error && (
@@ -102,9 +103,8 @@ const SignUpPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${
-                loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 text-white"
-              }`}
+              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                }`}
             >
               {loading ? "Registering..." : "Sign Up"}
             </button>
@@ -122,9 +122,8 @@ const SignUpPage: React.FC = () => {
                 key={provider.name}
                 onClick={provider.action}
                 disabled={loading}
-                className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : `text-white border-2 ${provider.color}`
-                }`}
+                className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${loading ? "bg-gray-400 cursor-not-allowed" : `text-white border-2 ${provider.color}`
+                  }`}
               >
                 {loading ? "Loading..." : <img src={provider.icon} alt={provider.name} className="w-7 h-7" />}
               </button>

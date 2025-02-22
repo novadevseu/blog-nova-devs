@@ -140,7 +140,7 @@ const LoginPage: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="text-black mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
             <div>
@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="mt-1 mb-3 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="text-black mt-1 mb-3 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
             {error && (
@@ -165,8 +165,8 @@ const LoginPage: React.FC = () => {
               type="submit"
               disabled={loading}
               className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 text-white"
                 }`}
             >
               {loading ? "Logging in..." : "Log In"}
@@ -186,8 +186,8 @@ const LoginPage: React.FC = () => {
                 onClick={provider.action}
                 disabled={loading}
                 className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : `text-white border-2 ${provider.color}`
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : `text-white border-2 ${provider.color}`
                   }`}
               >
                 {loading ? (
@@ -264,8 +264,8 @@ const LoginPage: React.FC = () => {
                 onClick={handleSendResetEmail}
                 disabled={resetLoading || !resetEmail}
                 className={`px-4 py-2 rounded text-sm font-medium ${resetLoading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
                   }`}
               >
                 {resetLoading ? "Sending..." : "Send Reset Email"}

@@ -127,7 +127,7 @@ const Profile: React.FC = () => {
             <div className="mb-4">
               <button
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                // Placeholder: reset password functionality is not implemented.
+              // Placeholder: reset password functionality is not implemented.
               >
                 Reset Password
               </button>

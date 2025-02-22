@@ -39,13 +39,14 @@ export const googleLoginHook = async ({
     });
     // Actualiza Redux
     dispatch(setUser(userData));
-    
+
     // Redirige al perfil
     router.push("/profile");
   } catch (error: any) {
     console.error("Error durante la autenticación con Google:", error);
     setError(error.message || "Error desconocido.");
   } finally {
+    // TODO Cambiar el estado de carga a solo el de Google
     setLoading(false);
   }
 };

@@ -34,11 +34,10 @@ export const useSignUp = async ({
     const userData = await getOrCreateUserDocument({ uid: user.uid, email: user.email });
     // Actualiza Redux
     dispatch(setUser(userData));
-    
+
   } catch (err: any) {
     setError(err.message || "Ocurrió un error desconocido.");
   } finally {
     setLoading(false);
   }
 };
- 

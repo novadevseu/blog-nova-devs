@@ -77,7 +77,7 @@ export const getOrCreateUserDocument = async (user: {
     // If the document does not exist, create it with default role "Viewer".
     const newUser: UserType = {
       uid: user.uid,
-      email: user.email || "",
+      email: "",
       role: "Viewer",
       fullName: "",
       img: "",
