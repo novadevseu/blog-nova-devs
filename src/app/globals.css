@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #090D1F;
+  --background: #171d38;
   --foreground: #FFFFFF;
 }
 
@@ -24,7 +24,9 @@ body {
 
   font-family: 'Inter';
 
-
+  /* background-image: url("/images/cafe.png");
+  background-repeat: repeat; 
+  background-size: 50px;  */
 }
 
 /* Estilo base (pantallas pequeñas) */
