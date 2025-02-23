@@ -1,24 +1,17 @@
 import { db } from "@/config/firebase-config";
 import { Comment } from "@/types/CommentType";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  doc,
-  getDoc,
-} from "@firebase/firestore";
+import { collection, getDocs, query, where, doc, getDoc } from "@firebase/firestore";
 
 export interface FetchUserComments {
-  email: string;
+  userUid: string;
 }
 
 export const fetchUserComments = async ({
-  email,
+  userUid,
 }: FetchUserComments): Promise<Comment[]> => {
   const commentsRef = collection(db, "comments");
 
-  const q = query(commentsRef, where("email", "==", email));
+  const q = query(commentsRef, where("userUid", "==", userUid));
 
   const querySnapshot = await getDocs(q);
 

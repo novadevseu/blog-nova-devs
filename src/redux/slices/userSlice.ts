@@ -19,6 +19,7 @@ export interface UserType {
   skills?: string;
   bio?: string;
   linkedIn?: string;
+  subscribed: boolean;
 }
 
 interface UserState {

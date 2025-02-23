@@ -12,7 +12,9 @@ interface UsernameContainerInterface {
     };
     setFormData : React.Dispatch<React.SetStateAction<{
         username : string,
-        fullName : string
+        fullName : string,
+        email: string;
+      subscribe: boolean;
     }>>;
 }
 

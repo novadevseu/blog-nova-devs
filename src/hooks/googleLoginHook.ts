@@ -35,7 +35,6 @@ export const googleLoginHook = async ({
     // Obtiene (o crea) el documento del usuario en Firestore
     const userData = await getOrCreateUserDocument({
       uid: user.uid,
-      email: user.email,
     });
     // Actualiza Redux
     dispatch(setUser(userData));

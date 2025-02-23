@@ -1,6 +1,5 @@
 // redux/store.ts
 import { configureStore } from "@reduxjs/toolkit";
-// TODO Cambiar UserType de archivo
 import userReducer, { setUser, UserType } from "./slices/userSlice";
 import { getCookie } from "@/utils/cookies";
 
@@ -12,17 +11,17 @@ export const makeStore = () => {
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
-          // Ignore these paths where non-serializable data (like Date or Firestore Timestamp) might appear
           ignoredPaths: ['currentUser.user.createdAt'],
           ignoredActionPaths: ['payload.createdAt'],
         },
       }),
   });
 
-  // Restaurar el estado del usuario desde las cookies
+  // Restaurar el estado del usuario desde las cookies.
+  // getCookie ya devuelve el valor parseado o null.
   const userCookie = getCookie("user");
   if (userCookie) {
-    store.dispatch(setUser(JSON.parse(userCookie) as UserType));
+    store.dispatch(setUser(userCookie as UserType));
   }
 
   return store;

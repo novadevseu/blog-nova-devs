@@ -10,36 +10,36 @@ import UsernameContainer from "./UsernameContainer";
 import AdminContainer from "./AdminContainer";
 import ProfilePictureContainer from "./ProfilePictureContainer";
 import UserComments from "./UserComments";
+import EmailContainer from "./EmailContainer";
 
-/**
- * The Profile component relies on Redux and our prebuilt services,
- * so it does not contain any direct Firebase logic.
- */
 const Profile: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  // Get the current user from Redux using our custom hook.
+  // Obtenemos el usuario actual desde Redux.
   const currentUser = useUser();
 
-  // contains current input datas in email, username
+  // Estado global para el formulario de datos del usuario.
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
+    email: "",
+    subscribe: false,
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // fetch the user details to the form data
+  // Cuando currentUser cambie, actualizamos el estado.
   useEffect(() => {
     if (currentUser) {
       setFormData({
         fullName: currentUser.fullName,
         username: currentUser.username,
+        email: currentUser.email,
+        subscribe: currentUser.subscribed || false,
       });
     }
   }, [currentUser]);
 
-  // If no user is logged in, display an authentication prompt.
   if (!currentUser) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-transparent">
@@ -54,20 +54,19 @@ const Profile: React.FC = () => {
     );
   }
 
-  // Logout handler using our service method.
+  // Logout handler.
   const handleLogout = async () => {
     try {
       await logoutUser(dispatch);
       router.push("/auth/login");
     } catch (error) {
       console.error("Failed to log out:", error);
-      // Optionally, display an error message to the user.
     }
   };
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className=" flex flex-col items-center justify-center py-10">
+      <div className="flex flex-col items-center justify-center py-10">
         {/* Main Profile Card */}
         <div className="p-4">
           <button
@@ -76,22 +75,19 @@ const Profile: React.FC = () => {
           >
             Show Comments
           </button>
-          <UserComments
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
+          <UserComments isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </div>
-        <div className=" bg-[#0c122a] p-6 rounded-lg w-full max-w-4xl  ">
+        <div className="bg-[#0c122a] p-6 rounded-lg w-full max-w-4xl">
           <h2 className="text-2xl font-semibold text-center mb-6 text-white">
             Profile
           </h2>
           <div className="text-center mb-6">
             <p className="text-sm text-gray-300">
-              <strong>Email:</strong> {currentUser.email}
+              <strong>Welcome:</strong> {currentUser.username}
             </p>
           </div>
 
-          {/* Profile Settings Section (placeholders, non-functional) */}
+          {/* Profile Settings Section */}
           <div className="mt-8 bg-transparent p-4 border border-gray-700 rounded-lg">
             <h3 className="text-xl font-semibold mb-4 text-white">
               Profile Settings
@@ -99,41 +95,20 @@ const Profile: React.FC = () => {
             {/* Profile Picture */}
             <ProfilePictureContainer />
             {/* Display Name */}
-            <NameContainer {...{ formData, setFormData }} />
-            {/* Email Notifications Toggle */}
-            <div className="mb-4 flex items-center">
-              <label className="block text-gray-300 mr-4">
-                Email Notifications
-              </label>
-              <div className="w-6 h-6 flex items-center justify-center bg-green-600 rounded-full">
-                <svg
-                  className="w-4 h-4 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="3"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              {/* This toggle is only visual and non-functional. */}
-            </div>
-            {/* Reset Password */}
+            <NameContainer formData={formData} setFormData={setFormData} />
+            {/* Email & Newsletter */}
+            <EmailContainer formData={formData} setFormData={setFormData} />
+            {/* Reset Password (placeholder) */}
             <div className="mb-4">
               <button
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                // Placeholder: reset password functionality is not implemented.
+                // Aquí podrías implementar la funcionalidad de reset de password.
               >
                 Reset Password
               </button>
             </div>
             {/* Update Username */}
-            <UsernameContainer {...{ formData, setFormData }} />
+            <UsernameContainer formData={formData} setFormData={setFormData} />
             {currentUser.role === "Admin" && <AdminContainer />}
           </div>
           {/* Admin-only "Create a New Post" Button */}
@@ -147,7 +122,6 @@ const Profile: React.FC = () => {
               </button>
             </div>
           )}
-
           {/* Logout Button */}
           <button
             onClick={handleLogout}

@@ -42,7 +42,7 @@ export const loginHook = async ({
     // Intenta iniciar sesión con email y contraseña
     const user = await loginWithEmail(email, password);
     // Obtiene (o crea) el documento del usuario en Firestore
-    const userData = await getOrCreateUserDocument({ uid: user.uid, email: user.email });
+    const userData = await getOrCreateUserDocument({ uid: user.uid});
     // Actualiza el estado global (Redux)
     dispatch(setUser(userData));
     await setUserSession(userData.uid);

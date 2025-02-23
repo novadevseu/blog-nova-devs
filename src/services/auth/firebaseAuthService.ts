@@ -68,21 +68,23 @@ export const signUpWithEmail = async (email: string, password: string) => {
  */
 export const getOrCreateUserDocument = async (user: {
   uid: string;
-  email: string | null;
 }): Promise<UserType> => {
   const userDocRef = doc(db, "users", user.uid);
   const userDoc = await getDoc(userDocRef);
 
   if (!userDoc.exists()) {
-    // If the document does not exist, create it with default role "Viewer".
+    // Genera un username aleatorio, por ejemplo: "user123456"
+    const randomUsername = `user${Math.floor(Math.random() * 1000000)}`;
+    // If the document does not exist, create it with default role "Viewer" and a random username.
     const newUser: UserType = {
       uid: user.uid,
-      email: user.email || "",
+      email: "",
       role: "Viewer",
       fullName: "",
       img: "",
       profile: "",
-      username: "",
+      username: randomUsername,
+      subscribed: false,
     };
     await setDoc(userDocRef, {
       ...newUser,

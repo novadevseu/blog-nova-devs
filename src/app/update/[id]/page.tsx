@@ -22,7 +22,7 @@ interface Post {
 
 const UpdatePostPage: React.FC = () => {
   const params = useParams();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id; // Ensure id is a string
+  const id = Array.isArray(params!.id) ? params!.id[0] : params!.id;
   const router = useRouter();
 
   const [user, setUser] = useState<null | { email: string; role: string }>(null);

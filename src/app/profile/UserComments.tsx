@@ -18,7 +18,7 @@ function UserComments({ isOpen, onClose }: UserCOmmentsInterface) {
   useEffect(() => {
     (async () => {
       const commentsData = await fetchUserComments({
-        email: currentUser!.email,
+        userUid: currentUser!.uid,
       });
       setComments(commentsData as unknown as SetStateAction<Comment[]>);
     })();
