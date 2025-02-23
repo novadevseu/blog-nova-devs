@@ -27,7 +27,7 @@ function UsernameContainer ({formData,setFormData} : UsernameContainerInterface)
     const dispatch = useDispatch();
 
     const handleEditUsername = async () => {
-        editUserData(dispatch,{username : formData.username})
+        editUserData(dispatch, currentUser!.uid,{username : formData.username})
     }
 
     if(currentUser)

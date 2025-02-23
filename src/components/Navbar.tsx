@@ -55,9 +55,6 @@ const Navbar: React.FC = () => {
           <Link href="/about">
             <span className={`cursor-pointer ${isActive("/about") ? "underline" : ""}`}>About</span>
           </Link>
-          <Link href="/archive">
-            <span className={`cursor-pointer ${isActive("/archive") ? "underline" : ""}`}>Archive</span>
-          </Link>
           {!currentUser ? (
             <>
               <Link href="/auth/login">

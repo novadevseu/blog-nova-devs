@@ -224,7 +224,19 @@ const UpdatePostPage: React.FC = () => {
                 Categories
               </label>
               <div className="mt-2 space-y-2">
-                {["Technology", "Health", "Finance", "Education", "Entertainment"].map((category) => (
+                {[
+  "Technology",
+  "Health",
+  "Finance",
+  "Education",
+  "Entertainment",
+  "News",
+  "Tutorials",
+  "Projects",
+  "Guides",
+  "Tips"
+]
+.map((category) => (
                   <div key={category} className="flex items-center">
                     <input
                       type="checkbox"

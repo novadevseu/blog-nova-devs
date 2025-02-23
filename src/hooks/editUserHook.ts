@@ -2,6 +2,7 @@ import { db } from "@/config/firebase-config";
 import { setUser, UserType } from "@/redux/slices/userSlice";
 import { doc, getDoc, updateDoc } from "@firebase/firestore";
 import { Dispatch } from "@reduxjs/toolkit";
+import { useUser } from "./useUser";
 
 /**
  * Actualiza el documento del usuario en Firestore con los datos proporcionados.
@@ -9,14 +10,15 @@ import { Dispatch } from "@reduxjs/toolkit";
  * muestra una confirmación y recarga la página.
  *
  * @param dispatch - Función dispatch de Redux.
+ * @param userId  - 
  * @param updateUserData - Objeto parcial de UserType con los valores actualizados (ej. email, linkedIn, etc.)
  */
 export const editUserData = async (
-  dispatch: Dispatch,
+  dispatch: Dispatch, userId : string,
   updateUserData: Partial<UserType>
 ) => {
   // Recupera el ID del usuario desde localStorage.
-  const userId = localStorage.getItem("uid");
+  
 
   if (!userId) {
     return null;

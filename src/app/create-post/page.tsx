@@ -1,8 +1,7 @@
 "use client";
-
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../config/firebase-config";
 import dynamic from "next/dynamic";
 import { useUser } from "@/hooks/useUser";
@@ -30,17 +29,51 @@ const CreatePost: React.FC = () => {
     setLoading(true);
 
     try {
+      // Guarda el post en Firestore
       const docRef = await addDoc(collection(db, "posts"), {
         title,
         shortDescription,
         content,
         thumbnailUrl,
         categories,
-        author: user?.email,
+        authorUid: user?.uid,
         timestamp: new Date(),
       });
 
-      // Redirige al detalle del post recién creado
+      // Prepara los datos del post para el email
+      const postData = {
+        title,
+        shortDescription,
+        thumbnailUrl,
+        author: user?.email || "Unknown",
+        timestamp: new Date().getTime(), // timestamp en milisegundos
+      };
+
+      // Realiza el query en el cliente para obtener destinatarios
+      const usersRef = collection(db, "users");
+      const q = query(
+        usersRef,
+        where("subscribed", "==", true),
+        where("email", "!=", "")
+      );
+      const snapshot = await getDocs(q);
+      const recipients = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return { email: data.email };
+      });
+
+      // Llama al endpoint del backend para enviar los emails
+      alert("Sending notification emails...");
+      const res = await fetch("/api/send-newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipients, post: postData }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error("Failed to send notification emails");
+      }
+      alert("Notification emails sent successfully!");
       router.push(`/posts/${docRef.id}`);
     } catch (error) {
       console.error("Error creating post:", error);
@@ -110,22 +143,31 @@ const CreatePost: React.FC = () => {
         <div className="mb-4">
           <label className="block text-sm font-medium">Categories</label>
           <div className="mt-2 space-y-2">
-            {["Technology", "Health", "Finance", "Education", "Entertainment"].map(
-              (category) => (
-                <div key={category} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={category}
-                    checked={categories.includes(category)}
-                    onChange={() => handleCategoryChange(category)}
-                    className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                  />
-                  <label htmlFor={category} className="ml-2 text-sm">
-                    {category}
-                  </label>
-                </div>
-              )
-            )}
+            {[
+              "Technology",
+              "Health",
+              "Finance",
+              "Education",
+              "Entertainment",
+              "News",
+              "Tutorials",
+              "Projects",
+              "Guides",
+              "Tips",
+            ].map((category) => (
+              <div key={category} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={category}
+                  checked={categories.includes(category)}
+                  onChange={() => handleCategoryChange(category)}
+                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                />
+                <label htmlFor={category} className="ml-2 text-sm">
+                  {category}
+                </label>
+              </div>
+            ))}
           </div>
         </div>
 

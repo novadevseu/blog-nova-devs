@@ -26,7 +26,7 @@ function NameContainer({ formData, setFormData }: NameContainerInterface) {
   const dispatch = useDispatch();
 
   const handleEditFullName = async () => {
-    await editUserData(dispatch, { fullName: formData.fullName });
+    await editUserData(dispatch, currentUser!.uid,{ fullName: formData.fullName });
   };
 
   if (currentUser)

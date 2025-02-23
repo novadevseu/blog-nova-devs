@@ -5,6 +5,8 @@ import { deleteCommentHook } from "@/services/comments/deleteCommentHook";
 import { fetchCommentsHook } from "@/services/comments/fetchCommentsHook";
 import { Comment } from "@/types/CommentType";
 import { useEffect, useState } from "react";
+import { collection, query, where, getDocs } from "@firebase/firestore";
+import { db } from "@/config/firebase-config";
 
 interface CommentContainerInterface {
   id: string; // Este id corresponde al postId
@@ -18,28 +20,52 @@ function CommentContainer({ id }: CommentContainerInterface) {
   const [replyComment, setReplyComment] = useState("");
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [usernames, setUsernames] = useState<{ [uid: string]: string }>({});
 
+  // Efecto para subscribirse a los comentarios.
   useEffect(() => {
-    console.log(comments);
-  }, [comments]);
-
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      if (currentUser) {
-        try {
-          setUserRole(currentUser.role);
-          setUserUid(currentUser.uid);
-        } catch (err) {
-          console.error("Error loading user role:", err);
-        }
-      }
-    };
-
-    // Se suscribe a los comentarios filtrados por postId.
     const unsubscribeComments = fetchCommentsHook({ id, setComments });
-    fetchUserRole();
     return () => unsubscribeComments();
   }, [id]);
+
+  // Efecto para cargar datos del usuario actual.
+  useEffect(() => {
+    if (currentUser) {
+      setUserRole(currentUser.role);
+      setUserUid(currentUser.uid);
+    }
+  }, [currentUser]);
+
+  // Efecto para obtener los nombres de usuario antes de renderizar
+  useEffect(() => {
+    // Extraemos UIDs de comentarios y respuestas.
+    const uidSet = new Set<string>();
+    comments.forEach((comment) => {
+      uidSet.add(comment.userUid);
+      if (comment.replies && comment.replies.length > 0) {
+        comment.replies.forEach((reply) => uidSet.add(reply.userUid));
+      }
+    });
+    const uids = Array.from(uidSet);
+    if (uids.length === 0) return;
+
+    // Nota: La consulta "in" tiene un límite de 10 elementos.
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("uid", "in", uids));
+    getDocs(q)
+      .then((snapshot) => {
+        const fetchedUsernames: { [uid: string]: string } = {};
+        snapshot.docs.forEach((doc) => {
+          const data = doc.data();
+          // Suponiendo que el documento tiene los campos "uid" y "username".
+          fetchedUsernames[data.uid] = data.username;
+        });
+        setUsernames(fetchedUsernames);
+      })
+      .catch((error) => {
+        console.error("Error fetching usernames: ", error);
+      });
+  }, [comments]);
 
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,8 +126,10 @@ function CommentContainer({ id }: CommentContainerInterface) {
 
       {comments.map((comment: Comment) => (
         <div key={comment.id} className="border-gray-200 pb-4 mb-4">
-          {/* Se muestra el userUid del autor del comentario */}
-          <p className="text-sm font-medium">{comment.userUid}</p>
+          {/* Mostramos el username en lugar del userUid */}
+          <p className="text-sm font-medium">
+            {usernames[comment.userUid] || comment.userUid}
+          </p>
           <p className="text-gray-700">{comment.content}</p>
           <p className="text-xs text-gray-500">
             {new Date(comment.timestamp.seconds * 1000).toLocaleString()}
@@ -167,12 +195,12 @@ function CommentContainer({ id }: CommentContainerInterface) {
                   key={innerComment.id}
                   className="border-b border-gray-200 pb-4 mt-6 ml-10"
                 >
-                  <p className="text-sm font-medium">{innerComment.userUid}</p>
+                  <p className="text-sm font-medium">
+                    {usernames[innerComment.userUid] || innerComment.userUid}
+                  </p>
                   <p className="text-gray-700">{innerComment.content}</p>
                   <p className="text-xs text-gray-500">
-                    {new Date(
-                      innerComment.timestamp.seconds * 1000
-                    ).toLocaleString()}
+                    {new Date(innerComment.timestamp.seconds * 1000).toLocaleString()}
                   </p>
                   {(userRole === "Admin" ||
                     (userUid && userUid === innerComment.userUid)) && (

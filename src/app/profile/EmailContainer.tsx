@@ -28,9 +28,9 @@ function EmailContainer({ formData, setFormData }: EmailContainerInterface) {
   const dispatch = useDispatch();
 
   const handleEditEmail = async () => {
-    await editUserData(dispatch, {
+    await editUserData(dispatch, currentUser!.uid,{
       email: formData.email,
-      subscribed: formData.subscribe,
+      subscribed: formData.subscribe, 
     });
   };
 

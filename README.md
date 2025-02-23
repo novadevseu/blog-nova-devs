@@ -74,6 +74,7 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
 SESSION_SECRET=Random_generated_secret_32_characters_min
+RESEND_API_KEY=Key_Resens_API
 ```
 
 Start the development server:
