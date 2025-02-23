@@ -13,6 +13,7 @@
     "@reduxjs/toolkit": "^2.5.1",
     "@uiw/react-md-editor": "^4.0.5",
     "firebase": "^11.2.0",
+    "flowbite-react": "^0.10.2",
     "install": "^0.13.0",
     "iron-session": "^8.0.4",
     "js-cookie": "^3.0.5",
