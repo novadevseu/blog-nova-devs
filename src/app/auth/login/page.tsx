@@ -1,26 +1,37 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { loginHook } from "@/hooks/mailLoginHook";
 import { googleLoginHook } from "@/hooks/googleLoginHook";
 import { githubLoginHook } from "@/hooks/githubLoginHook";
 import { yahooLoginHook } from "@/hooks/yahooLoginHook";
+import { validateEmail, validatePassword } from "@/utils/validation"; // Importamos las funciones de validación
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [emailError, setEmailError] = useState(""); // Error del email
+  const [passwordError, setPasswordError] = useState(""); // Error de la contraseña
 
- 
   const router = useRouter();
   const dispatch = useDispatch();
 
-
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validación del email y la contraseña
+    const emailValidation = validateEmail(email);
+    const passwordValidation = validatePassword(password);
+
+    if (emailValidation || passwordValidation) {
+      setEmailError(emailValidation);
+      setPasswordError(passwordValidation);
+      return;
+    }
+
     await loginHook({
       e,
       setError,
@@ -78,13 +89,15 @@ const LoginPage: React.FC = () => {
                 Email
               </label>
               <input
-                type="email"
+                type="text"
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 text-black block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
+              {emailError && (
+                <div className="text-red-500 text-sm mt-1">{emailError}</div>
+              )}
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium">
@@ -95,9 +108,12 @@ const LoginPage: React.FC = () => {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
-                className="mt-1 mb-3 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+
+                className="mt-1 text-black mb-3 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
+              {passwordError && (
+                <div className="text-red-500 text-sm mt-1">{passwordError}</div>
+              )}
             </div>
             {error && (
               <div className="bg-red-100 text-red-700 p-3 rounded-md text-sm mt-4">
@@ -107,9 +123,8 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${
-                loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 text-white"
-              }`}
+              className={`w-full py-2 px-4 font-medium rounded-md shadow-sm ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                }`}
             >
               {loading ? "Logging in..." : "Log In"}
             </button>
@@ -127,9 +142,7 @@ const LoginPage: React.FC = () => {
                 key={provider.name}
                 onClick={provider.action}
                 disabled={loading}
-                className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : `text-white border-2 ${provider.color}`
-                }`}
+                className={`py-2 px-4 font-medium rounded-md shadow-sm flex justify-center items-center w-32 h-12 ${loading ? "bg-gray-400 cursor-not-allowed" : `text-white border-2 ${provider.color}`}`}
               >
                 {loading ? "Loading..." : <img src={provider.icon} alt={provider.name} className="w-7 h-7" />}
               </button>
@@ -138,10 +151,10 @@ const LoginPage: React.FC = () => {
 
           <div className="mt-6 text-center text-sm text-blue-500 flex justify-between mx-7 underline">
             <button onClick={() => router.push("/auth/signup")} className="hover:text-blue-600">
-              ¿No tienes una cuenta?
+              Don't have an account?
             </button>
             <button onClick={() => router.push("/auth/forgot-password")} className="hover:text-blue-600">
-              ¿Olvidaste tu contraseña?
+              Forgot your password?
             </button>
           </div>
         </div>
