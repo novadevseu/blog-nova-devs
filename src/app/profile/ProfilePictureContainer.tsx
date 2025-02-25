@@ -13,7 +13,7 @@ export default function ProfilePictureContainer() {
 
   const handleSavePicture = async () => {
     await editUserData(dispatch, currentUser!.uid, { img: selectedImage });
-    setEdit(false); 
+    setEdit(false);
   };
 
   if (currentUser)
@@ -32,11 +32,10 @@ export default function ProfilePictureContainer() {
                 {[...Array(8)].map((_, index) => (
                   <button
                     key={index}
-                    className={`w-12 h-12 rounded-full overflow-hidden border-2 ${
-                      selectedImage === `/profile_pictures/${index + 1}.png`
-                        ? "border-blue-500"
-                        : "border-gray-300"
-                    } hover:border-blue-500`}
+                    className={`w-12 h-12 rounded-full overflow-hidden border-2 ${selectedImage === `/profile_pictures/${index + 1}.png`
+                      ? "border-blue-500"
+                      : "border-gray-300"
+                      } hover:border-blue-500`}
                     onClick={() => setSelectedImage(`/profile_pictures/${index + 1}.png`)}
                   >
                     <img
