@@ -94,80 +94,125 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    
-    <div className="min-h-screen">
-      {/* Banner Section */}
-      <h2
-          className=" font-semibold text-center font-sans mb-8 border-t-2 border-b-2 border-white"
-          id="title"
-        >
-          Coffee<span style={{ color: "#E0C600" }}>Script</span> & Chill
-        </h2>
-
-      {/* Carousel Section */}
-      <LastPosts
-        posts={posts.slice(0, 4)}
-        loading={loading && posts.length === 0}
-      />
-
-      {/* Two-column layout: Left for Posts Cards, Right for Sidebar */}
-      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
-        {/* Left Column (Posts) */}
-        <div className="w-full md:w-1/2">
-          <h2 className="text-2xl font-bold mb-4">Posts</h2>
-          {loading && posts.length === 0 ? (
-            <Skeleton count={6} height={200} />
-          ) : (
-            // The posts used in the carousel (first 4) are skipped here
-            <AllPosts
-              posts={posts.slice(4)}
-              loading={loading && posts.length === 0}
-            />
-          )}
-
-          {/* Load More Button */}
-          {hasMore && !loading && (
-            <div className="flex justify-center mt-8">
-              <button
-                onClick={() => fetchPosts()}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-              >
-                Load More
-              </button>
-            </div>
-          )}
-          {!hasMore && !loading && (
-            <p className="text-center text-gray-500 mt-8">No more posts</p>
-          )}
+    <div className="min-h-screen pt-24 bg-gradient-to-b from-[#090d1f] to-[#090d1f]/95 text-white">
+      {/* Hero Banner Section */}
+      <div className="relative py-16 overflow-hidden border-b border-[#E0C600]/10">
+        <div className="absolute inset-0 bg-[url('/images/grid-pattern.png')] opacity-10"></div>
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl md:text-6xl font-bold text-center mb-6 tracking-tight">
+            Coffee<span className="text-[#E0C600] animate-pulse">Script</span>
+            <span className="text-gray-400">&</span>
+            Chill
+          </h1>
+          <p className="text-gray-400 text-center max-w-2xl mx-auto text-lg">
+            Explora el mundo del desarrollo web a través de historias, tutoriales y experiencias compartidas
+          </p>
         </div>
+      </div>
 
-        {/* Right Column (Sticky Sidebar) */}
-        <div className="w-full md:w-1/2">
-          <div className="p-4 sticky top-0">
-            <h3 className="text-xl font-semibold mb-4">Learn More</h3>
-            <ul className="space-y-2">
-              {sidebarLinks.map((link, index) => (
-                <li key={index}>
-                  <a href={link.href} className="text-blue-600 hover:underline">
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-8">
-              <button
-                onClick={scrollToTop}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Back to Top
-              </button>
+      {/* Featured Posts Carousel */}
+      <section className="py-12 bg-[#090d1f]/50 backdrop-blur-sm">
+        <div className="container mx-auto px-4">
+          <LastPosts
+            posts={posts.slice(0, 4)}
+            loading={loading && posts.length === 0}
+          />
+        </div>
+      </section>
+
+      {/* Main Content Section */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Posts Column */}
+          <div className="lg:w-2/3">
+            <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+              <span className="w-8 h-0.5 bg-[#E0C600]"></span>
+              Últimos Posts
+            </h2>
+            
+            {loading && posts.length === 0 ? (
+              <div className="space-y-6">
+                <Skeleton count={6} height={200} baseColor="#1a1f35" highlightColor="#252b47" />
+              </div>
+            ) : (
+              <div className="grid gap-6">
+                <AllPosts
+                  posts={posts.slice(4)}
+                  loading={loading && posts.length === 0}
+                />
+              </div>
+            )}
+
+            {/* Load More Button */}
+            {hasMore && !loading && (
+              <div className="flex justify-center mt-12">
+                <button
+                  onClick={() => fetchPosts()}
+                  className="px-6 py-3 bg-[#E0C600] text-[#090d1f] rounded-lg
+                    font-semibold transition-all duration-300
+                    hover:bg-[#E0C600]/90 hover:scale-105
+                    shadow-[0_0_15px_rgba(224,198,0,0.3)]
+                    hover:shadow-[0_0_20px_rgba(224,198,0,0.4)]"
+                >
+                  Cargar Más
+                </button>
+              </div>
+            )}
+            {!hasMore && !loading && (
+              <p className="text-center text-gray-400 mt-8 italic">
+                Has llegado al final 🎉
+              </p>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:w-1/3">
+            <div className="sticky top-24 bg-[#0c1023] rounded-xl p-6 border border-gray-800/50
+              shadow-lg backdrop-blur-sm">
+              <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                <span className="w-6 h-0.5 bg-[#E0C600]"></span>
+                Explorar
+              </h3>
+              <ul className="space-y-4">
+                {sidebarLinks.map((link, index) => (
+                  <li key={index}
+                    className="transform transition-all duration-300 hover:translate-x-2">
+                    <a href={link.href} 
+                      className="text-gray-300 hover:text-[#E0C600] flex items-center gap-2">
+                      <span className="w-2 h-2 bg-[#E0C600] rounded-full"></span>
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 pt-8 border-t border-gray-800/50">
+                <button
+                  onClick={scrollToTop}
+                  className="w-full px-4 py-3 bg-[#090d1f] text-gray-300
+                    rounded-lg transition-all duration-300
+                    hover:text-[#E0C600] hover:shadow-[0_0_15px_rgba(224,198,0,0.2)]
+                    border border-gray-800/50 hover:border-[#E0C600]/50
+                    flex items-center justify-center gap-2"
+                >
+                  <span>Volver arriba</span>
+                  <span className="text-sm">↑</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Error Message */}
-      {error && <p className="text-center text-red-500">{error}</p>}
+      {error && (
+        <div className="fixed bottom-4 right-4 bg-red-500/90 text-white px-6 py-3 rounded-lg
+          shadow-lg backdrop-blur-sm animate-slide-up">
+          <p className="flex items-center gap-2">
+            <span>⚠️</span>
+            {error}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

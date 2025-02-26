@@ -189,3 +189,44 @@ body {
   overflow-x: auto;
   font-family: 'Courier New', Courier, monospace;
 }
+
+@layer utilities {
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+  
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+.custom-carousel .carousel-root {
+  position: relative;
+}
+
+.custom-carousel .control-arrow {
+  transform: none !important;
+}
+
+.custom-carousel .control-dots {
+  bottom: 16px !important;
+  margin: 0 !important;
+}
+
+.custom-carousel .dot {
+  background: #E0C600 !important;
+  opacity: 0.3 !important;
+  box-shadow: none !important;
+  margin: 0 6px !important;
+}
+
+.custom-carousel .dot.selected {
+  opacity: 1 !important;
+}

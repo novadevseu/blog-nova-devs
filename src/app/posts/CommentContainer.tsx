@@ -60,121 +60,148 @@ function CommentContainer(
     }
 
     return (
-        <div className="mt-6">
-            <h2 className="text-xl font-semibold mb-4">Comments</h2>
+      <div className="mt-6 space-y-8">
+          <div className="bg-[#0c1023] rounded-xl p-6 border border-gray-800/50">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <span className="w-4 h-0.5 bg-[#E0C600]"></span>
+                  Comentarios
+                  <span className="text-sm text-gray-400">({comments.length})</span>
+              </h2>
 
-             {(
-              <form onSubmit={handleAddComment} className="mb-6 ">
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Write your comment..."
-                  className="w-full p-3 border border-gray-300 rounded-md mb-2"
-                  style={{ color: 'black' }}
-                  rows={3}
-                ></textarea>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700"
-                >
-                  Comment
-                </button>
-              </form>
-            )}  
-
-            {comments.map((comment : Comment) => (
-              <div key={comment.id} className=" border-gray-200 pb-4 mb-4">
-                <p className="text-sm font-medium">{comment.email}</p>
-                <p className="text-gray-700">{comment.content}</p>
-                <p className="text-xs text-gray-500">
-                  {new Date(comment.timestamp.seconds * 1000).toLocaleString()}
-                </p>
-                {
-                  selectedCommentId == comment.id && 
-                  <form>
-                    <textarea 
-                      value={replyComment}
-                      onChange={(e) => setReplyComment(e.target.value)} 
-                      className="w-full p-3 border border-gray-300 rounded-md mb-2"
-                      style={{ color: 'black' }}
+              {/* Comment Form */}
+              <form onSubmit={handleAddComment} className="space-y-4">
+                  <textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Escribe tu comentario..."
+                      className="w-full p-4 bg-[#090d1f] border border-gray-800/50 rounded-lg
+                          text-gray-300 placeholder-gray-500 focus:border-[#E0C600]/50
+                          focus:outline-none focus:ring-1 focus:ring-[#E0C600]/30
+                          transition-all duration-300"
                       rows={3}
-                    ></textarea>
-                  </form>
-                }
-                <div className="flex items-center gap-5 mt-2 border-b pb-5">
-                  {selectedCommentId != comment.id ? 
-                  <>
-                    <button
-                      onClick={() => setSelectedCommentId(comment.id)}
-                      className="text-blue-500 text-sm"
-                    >
-                      Reply
-                    </button>
-                    {userRole === "Admin" && (
-                      <button
-                        onClick={() => handleDeleteComment(comment.id)}
-                        className="text-red-500 text-sm"
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </> 
-                  : 
-                  <>
+                  />
                   <button
-                    onClick={(e) => {
-                      handleReplyComment(e)
-                      setReplyComment("")
-                    }}
-                    className="text-blue-500 text-sm"
+                      type="submit"
+                      className="px-6 py-2.5 bg-[#E0C600] text-[#090d1f] rounded-lg
+                          font-semibold transition-all duration-300
+                          hover:bg-[#E0C600]/90 hover:scale-105
+                          shadow-[0_0_15px_rgba(224,198,0,0.2)]
+                          hover:shadow-[0_0_20px_rgba(224,198,0,0.3)]
+                          disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={!userEmail}
                   >
-                    Submit
+                      {userEmail ? "Comentar" : "Inicia sesión para comentar"}
                   </button>
-                  {userRole === "Admin" && (
-                    <button
-                      onClick={() => {
-                        setSelectedCommentId(null)
-                        setReplyComment("")
-                      }}
-                      className="text-red-500 text-sm"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                  </> 
-                  }
-                </div>  
-                  {
-                    comment.replies && 
-                    comment.replies.length >= 1 && 
-                    <div>
-                      {
-                        comment.replies.map((innerComment : Comment) => {
-                          return (
-                            <div key={innerComment.id} className="border-b border-gray-200 pb-4 mt-6 ml-10">
-                              <p className="text-sm font-medium">{innerComment.email}</p>
-                              <p className="text-gray-700">{innerComment.content}</p>
-                              <p className="text-xs text-gray-500">
-                              {new Date(innerComment.timestamp.seconds * 1000).toLocaleString()}
-                              </p>
-                              { ((userRole === "Admin" ) || ( userEmail && userEmail == innerComment.email )) && (
-                                <button
-                                  onClick={() => handleDeleteComment(innerComment.id)}
-                                  className="text-red-500 text-sm"
-                                >
-                                  Delete
-                                </button>
-                              )}
-                            </div>
-                          )
-                        } ) 
-                      }
-                    </div>
-                  }  
-              </div>
-            ))} 
+              </form>
           </div>
-    )
+
+          {/* Comments List */}
+          <div className="space-y-6">
+              {comments.map((comment: Comment) => (
+                  <div key={comment.id} className="bg-[#0c1023] rounded-xl p-6 border border-gray-800/50
+                      transition-all duration-300 hover:border-gray-700/50">
+                      <div className="flex justify-between items-start mb-3">
+                          <p className="font-medium text-[#E0C600]">{comment.email}</p>
+                          <p className="text-xs text-gray-500">
+                              {new Date(comment.timestamp.seconds * 1000).toLocaleString()}
+                          </p>
+                      </div>
+                      <p className="text-gray-300 mb-4">{comment.content}</p>
+
+                      {/* Reply Form */}
+                      {selectedCommentId === comment.id && (
+                          <form className="mt-4 space-y-4">
+                              <textarea
+                                  value={replyComment}
+                                  onChange={(e) => setReplyComment(e.target.value)}
+                                  className="w-full p-4 bg-[#090d1f] border border-gray-800/50 rounded-lg
+                                      text-gray-300 placeholder-gray-500 focus:border-[#E0C600]/50
+                                      focus:outline-none focus:ring-1 focus:ring-[#E0C600]/30
+                                      transition-all duration-300"
+                                  placeholder="Escribe tu respuesta..."
+                                  rows={2}
+                              />
+                          </form>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-4 mt-4">
+                          {selectedCommentId !== comment.id ? (
+                              <>
+                                  <button
+                                      onClick={() => setSelectedCommentId(comment.id)}
+                                      className="text-sm text-[#E0C600] hover:text-[#E0C600]/80
+                                          transition-colors duration-300"
+                                  >
+                                      Responder
+                                  </button>
+                                  {userRole === "Admin" && (
+                                      <button
+                                          onClick={() => handleDeleteComment(comment.id)}
+                                          className="text-sm text-red-500 hover:text-red-400
+                                              transition-colors duration-300"
+                                      >
+                                          Eliminar
+                                      </button>
+                                  )}
+                              </>
+                          ) : (
+                              <>
+                                  <button
+                                      onClick={(e) => {
+                                          handleReplyComment(e);
+                                          setReplyComment("");
+                                      }}
+                                      className="text-sm text-[#E0C600] hover:text-[#E0C600]/80
+                                          transition-colors duration-300"
+                                  >
+                                      Enviar
+                                  </button>
+                                  <button
+                                      onClick={() => {
+                                          setSelectedCommentId(null);
+                                          setReplyComment("");
+                                      }}
+                                      className="text-sm text-red-500 hover:text-red-400
+                                          transition-colors duration-300"
+                                  >
+                                      Cancelar
+                                  </button>
+                              </>
+                          )}
+                      </div>
+
+                      {/* Replies */}
+                      {comment.replies && comment.replies.length > 0 && (
+                          <div className="mt-6 space-y-4 pl-6 border-l-2 border-gray-800/50">
+                              {comment.replies.map((reply: Comment) => (
+                                  <div key={reply.id} className="bg-[#090d1f] rounded-lg p-4
+                                      border border-gray-800/30">
+                                      <div className="flex justify-between items-start mb-2">
+                                          <p className="font-medium text-[#E0C600]">{reply.email}</p>
+                                          <p className="text-xs text-gray-500">
+                                              {new Date(reply.timestamp.seconds * 1000).toLocaleString()}
+                                          </p>
+                                      </div>
+                                      <p className="text-gray-300">{reply.content}</p>
+                                      {((userRole === "Admin") || (userEmail && userEmail === reply.email)) && (
+                                          <button
+                                              onClick={() => handleDeleteComment(reply.id)}
+                                              className="mt-2 text-sm text-red-500 hover:text-red-400
+                                                  transition-colors duration-300"
+                                          >
+                                              Eliminar
+                                          </button>
+                                      )}
+                                  </div>
+                              ))}
+                          </div>
+                      )}
+                  </div>
+              ))}
+          </div>
+      </div>
+  );
 }
 
 export default CommentContainer
