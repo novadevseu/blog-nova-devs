@@ -15,8 +15,6 @@
     "firebase": "^11.2.0",
     "flowbite-react": "^0.10.2",
     "install": "^0.13.0",
-    "iron-session": "^8.0.4",
-    "js-cookie": "^3.0.5",
     "next": "15.1.6",
     "react": "^19.0.0",
     "react-comments-section": "^3.2.0",
@@ -26,14 +24,11 @@
     "react-markdown": "^9.0.3",
     "react-redux": "^9.2.0",
     "react-responsive-carousel": "^3.2.23",
-    "react-select": "^5.10.0",
     "remark-gfm": "^4.0.0",
-    "resend": "^4.1.2",
     "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

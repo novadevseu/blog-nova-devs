@@ -3,6 +3,6 @@ export interface Post {
     title: string;
     content: string;
     timestamp: { seconds: number; nanoseconds: number };
-    authorUid: string; // New field
+    author: string; // New field
     categories: string[]; // New field
 }

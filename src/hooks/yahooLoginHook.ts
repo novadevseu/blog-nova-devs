@@ -36,6 +36,7 @@ export const yahooLoginHook = async ({
     // Obtén o crea el documento del usuario en Firestore
     const userData = await getOrCreateUserDocument({
       uid: user.uid,
+      email: user.email,
     });
 
     // Actualiza Redux y guarda el uid en localStorage

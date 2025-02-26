@@ -22,7 +22,7 @@ interface Post {
 
 const UpdatePostPage: React.FC = () => {
   const params = useParams();
-  const id = Array.isArray(params!.id) ? params!.id[0] : params!.id;
+  const id = Array.isArray(params.id) ? params.id[0] : params.id; // Ensure id is a string
   const router = useRouter();
 
   const [user, setUser] = useState<null | { email: string; role: string }>(null);
@@ -224,19 +224,7 @@ const UpdatePostPage: React.FC = () => {
                 Categories
               </label>
               <div className="mt-2 space-y-2">
-                {[
-  "Technology",
-  "Health",
-  "Finance",
-  "Education",
-  "Entertainment",
-  "News",
-  "Tutorials",
-  "Projects",
-  "Guides",
-  "Tips"
-]
-.map((category) => (
+                {["Technology", "Health", "Finance", "Education", "Entertainment"].map((category) => (
                   <div key={category} className="flex items-center">
                     <input
                       type="checkbox"

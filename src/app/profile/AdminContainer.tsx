@@ -12,27 +12,26 @@ function AdminContainer() {
     education: "",
     skills: "",
     bio: "",
-    linkedIn: "",
   });
   const [edit, setEdit] = useState(false);
+
   const currentUser = useUser();
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (currentUser)
       setAdminFormData({
-        bio: currentUser.bio || "",
-        company: currentUser.company || "",
-        education: currentUser.education || "",
-        jobDescription: currentUser.jobDescription || "",
-        skills: currentUser.skills || "",
-        linkedIn: currentUser.linkedIn || "",
+        bio: currentUser?.bio || "",
+        company: currentUser?.company || "",
+        education: currentUser?.education || "",
+        jobDescription: currentUser?.jobDescription || "",
+        skills: currentUser?.skills || "",
       });
   }, [currentUser]);
 
   const handleSaveAdminValues = async () => {
     if (currentUser && currentUser.role === "Admin")
-      await editUserData(dispatch, currentUser!.uid,{ ...adminFormData });
+      await editUserData(dispatch, { ...adminFormData });
   };
 
   if (currentUser)
@@ -44,7 +43,7 @@ function AdminContainer() {
         {!edit ? (
           <button
             onClick={() => setEdit(true)}
-            className="px-4 py-2 my-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 my-2 bg-blue-600  text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Edit
           </button>
@@ -62,14 +61,14 @@ function AdminContainer() {
             <button
               onClick={() => {
                 setEdit(false);
-                setAdminFormData({
+                setAdminFormData((v) => ({
+                  ...v,
                   bio: currentUser?.bio || "",
                   company: currentUser?.company || "",
-                  education: currentUser?.education || "",
+                  education: currentUser.education || "",
                   jobDescription: currentUser?.jobDescription || "",
                   skills: currentUser?.skills || "",
-                  linkedIn: currentUser?.linkedIn || "",
-                });
+                }));
               }}
               className="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
             >
@@ -84,31 +83,37 @@ function AdminContainer() {
           className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
           disabled={!edit}
           onChange={(e) =>
-            setAdminFormData((v) => ({ ...v, jobDescription: e.target.value }))
+            setAdminFormData((v) => ({
+              ...v,
+              jobDescription: e.target.value,
+            }))
           }
-          value={adminFormData.jobDescription}
+          value={adminFormData.jobDescription || ""}
         />
         <label className="block text-gray-300 mb-1">Company/Organization</label>
         <input
           type="text"
-          placeholder="Enter a Company/Organization"
+          placeholder="Enter an Company/Organization"
           className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
           disabled={!edit}
           onChange={(e) =>
             setAdminFormData((v) => ({ ...v, company: e.target.value }))
           }
-          value={adminFormData.company}
+          value={adminFormData.company || ""}
         />
         <label className="block text-gray-300 mb-1">Education</label>
         <input
           type="text"
-          placeholder="Enter Education"
+          placeholder="Enter an Education"
           className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
           disabled={!edit}
           onChange={(e) =>
-            setAdminFormData((v) => ({ ...v, education: e.target.value }))
+            setAdminFormData((v) => ({
+              ...v,
+              education: e.target.value,
+            }))
           }
-          value={adminFormData.education}
+          value={adminFormData.education || ""}
         />
         <label className="block text-gray-300 mb-1">Skills/Technologies</label>
         <input
@@ -119,11 +124,11 @@ function AdminContainer() {
           onChange={(e) =>
             setAdminFormData((v) => ({ ...v, skills: e.target.value }))
           }
-          value={adminFormData.skills}
+          value={adminFormData.skills || ""}
         />
         <label className="block text-gray-300 mb-1">Biography</label>
         <textarea
-          value={adminFormData.bio}
+          value={adminFormData.bio || ""}
           onChange={(e) =>
             setAdminFormData((v) => ({ ...v, bio: e.target.value }))
           }
@@ -131,20 +136,8 @@ function AdminContainer() {
           placeholder="Type something..."
           disabled={!edit}
         ></textarea>
-        <label className="block text-gray-300 mb-1">LinkedIn Profile</label>
-        <input
-          type="text"
-          placeholder="Enter your LinkedIn URL"
-          className="w-full p-2 bg-transparent border border-gray-500 rounded text-white placeholder-gray-400"
-          disabled={!edit}
-          onChange={(e) =>
-            setAdminFormData((v) => ({ ...v, linkedIn: e.target.value }))
-          }
-          value={adminFormData.linkedIn}
-        />
       </div>
     );
-  return null;
 }
 
 export default AdminContainer;

@@ -13,9 +13,9 @@ export const fetchCommentsHook = ({ id, setComments }: FetchComments) => {
 
   return onSnapshot(q, (snapshot) => {
     const fetchedComments = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      replies: [] 
+        id: doc.id,
+        ...doc.data(),
+        replies: [] 
     })) as unknown as Comment[];
 
     const commentMap = new Map<string | null, Comment[]>();
@@ -26,12 +26,13 @@ export const fetchCommentsHook = ({ id, setComments }: FetchComments) => {
       if (!commentMap.has(parentId)) {
         commentMap.set(parentId, []);
       }
+
       commentMap.get(parentId)?.push(comment);
     });
 
     const nestedComments = (commentMap.get(null) || []).map((parent) => ({
       ...parent,
-      replies: commentMap.get(parent.id) || [],
+      replies: commentMap.get(parent.id) || [], 
     }));
 
     setComments(nestedComments);

@@ -26,19 +26,20 @@ export const githubLoginHook = async ({
     // Inicia sesión con GitHub
     const provider = new GithubAuthProvider();
     const result = await signInWithPopup(auth, provider);
-
+  
     const user = result.user;
-
+   
 
     // Obtén o crea el documento del usuario en Firestore
     const userData = await getOrCreateUserDocument({
       uid: user.uid,
-
+      email: user.email,
+      
     });
 
     // Actualiza Redux y guarda el uid en localStorage
     dispatch(setUser(userData));
-
+   
 
     // Redirige al perfil
     router.push("/profile");

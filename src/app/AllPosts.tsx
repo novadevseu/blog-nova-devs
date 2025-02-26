@@ -2,7 +2,7 @@
 import Link from "next/link";
 import React from "react";
 import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
+import 'react-loading-skeleton/dist/skeleton.css';
 
 interface Post {
   id: string;
@@ -12,17 +12,17 @@ interface Post {
   timestamp: { seconds: number; nanoseconds: number };
   thumbnailUrl: string;
   categories: string[];
-  authorUid: string;
+  author: string;
 }
 
-interface AllPostsProps {
+interface PostListProps {
   posts: Post[];
   loading: boolean;
-  authorsMap: { [uid: string]: { username: string; linkedIn?: string } };
 }
 
-const AllPosts: React.FC<AllPostsProps> = ({ posts, loading, authorsMap }) => {
+const AllPosts: React.FC<PostListProps> = ({ posts, loading }) => {
   if (loading && posts.length === 0) {
+    // Renderizamos esqueletos más vistosos para 6 cards de posts
     return (
       <div className="grid gap-6">
         {[...Array(6)].map((_, index) => (
@@ -59,6 +59,7 @@ const AllPosts: React.FC<AllPostsProps> = ({ posts, loading, authorsMap }) => {
       </div>
     );
   }
+
   return (
     <div className="grid gap-6">
       {posts.map((post) => (
@@ -78,18 +79,15 @@ const AllPosts: React.FC<AllPostsProps> = ({ posts, loading, authorsMap }) => {
           </div>
           <div className="p-4">
             <p className="text-sm text-gray-500">
-              {new Date(post.timestamp.seconds * 1000).toLocaleDateString(
-                "en-US",
-                {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                }
-              )}
+              {new Date(post.timestamp.seconds * 1000).toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </p>
             <Link href={`/posts/${post.id}`}>
-              <span className="block text-2xl font-bold mt-2 cursor-pointer">
+              <span className="block text-2xl font-bold mt-2 cursor-pointer ">
                 {post.title}
               </span>
             </Link>
@@ -105,22 +103,6 @@ const AllPosts: React.FC<AllPostsProps> = ({ posts, loading, authorsMap }) => {
                   {category}
                 </span>
               ))}
-            </div>
-            <div>
-              <span className="text-sm text-gray-500 mt-4 inline-block">
-                by {authorsMap[post.authorUid]?.username || "Unknown"}
-              </span>
-              {authorsMap[post.authorUid]?.linkedIn && (
-                <span className="text-sm text-blue-500 ml-2 inline-block">
-                  <a
-                    href={authorsMap[post.authorUid].linkedIn}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    LinkedIn
-                  </a>
-                </span>
-              )}
             </div>
             <Link href={`/posts/${post.id}`}>
               <span className="text-sm text-blue-500 mt-4 cursor-pointer inline-block">

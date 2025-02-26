@@ -1,20 +1,19 @@
-"use client";
-
-import React, { useState } from "react";
 import { useUser } from "@/hooks/useUser";
 import { editUserData } from "@/hooks/editUserHook";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 
 export default function ProfilePictureContainer() {
-  const [edit, setEdit] = useState(false);
-  const [selectedImage, setSelectedImage] = useState("0");
-  const currentUser = useUser();
-  const dispatch = useDispatch();
+    
+    const [edit, setEdit] = useState(false);
+    const [selectedImage,setSelectedImage] = useState("0");
+
+    const currentUser = useUser();
+      const dispatch = useDispatch();
 
   const handleSavePicture = async () => {
-    await editUserData(dispatch, currentUser!.uid, { img: selectedImage });
-    setEdit(false); 
-  };
+    await editUserData(dispatch,{img : selectedImage})
+  }
 
   if (currentUser)
     return (
@@ -32,12 +31,9 @@ export default function ProfilePictureContainer() {
                 {[...Array(8)].map((_, index) => (
                   <button
                     key={index}
-                    className={`w-12 h-12 rounded-full overflow-hidden border-2 ${
-                      selectedImage === `/profile_pictures/${index + 1}.png`
-                        ? "border-blue-500"
-                        : "border-gray-300"
-                    } hover:border-blue-500`}
-                    onClick={() => setSelectedImage(`/profile_pictures/${index + 1}.png`)}
+                    className={`w-12 h-12 rounded-full overflow-hidden border-2 ${selectedImage === `/profile_pictures/${index + 1}.png` ? 'border-blue-500' : 'border-gray-300'} hover:border-blue-500`}
+                    onClick={()=>setSelectedImage(`/profile_pictures/${index + 1}.png`)}
+                    
                   >
                     <img
                       src={`/profile_pictures/${index + 1}.png`}
@@ -48,15 +44,15 @@ export default function ProfilePictureContainer() {
                 ))}
               </div>
               <div className="flex justify-between">
-                <button
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                  onClick={() => setEdit(false)}
+                <button 
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    onClick={()=>setEdit(false)}    
                 >
                   Cancel
                 </button>
-                <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  onClick={handleSavePicture}
+                <button 
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    onClick={handleSavePicture}    
                 >
                   Save
                 </button>
@@ -79,5 +75,4 @@ export default function ProfilePictureContainer() {
         </button>
       </div>
     );
-  return null;
 }

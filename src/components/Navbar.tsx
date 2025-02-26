@@ -14,6 +14,10 @@ const Navbar: React.FC = () => {
   const pathname = usePathname(); // Get the current path
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    console.log(currentUser);
+  }, [currentUser]);
+
   const handleLogOut = async () => {
     try {
       const result = await logoutUser(dispatch);
@@ -54,6 +58,9 @@ const Navbar: React.FC = () => {
           </Link>
           <Link href="/about">
             <span className={`cursor-pointer ${isActive("/about") ? "underline" : ""}`}>About</span>
+          </Link>
+          <Link href="/archive">
+            <span className={`cursor-pointer ${isActive("/archive") ? "underline" : ""}`}>Archive</span>
           </Link>
           {!currentUser ? (
             <>
