@@ -1,8 +1,10 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
+import { motion } from "framer-motion";
+import 'react-loading-skeleton/dist/skeleton.css';
 
 interface Post {
   id: string;
@@ -12,46 +14,56 @@ interface Post {
   timestamp: { seconds: number; nanoseconds: number };
   thumbnailUrl: string;
   categories: string[];
-  authorUid: string;
+  author: string;
 }
 
-interface AllPostsProps {
+interface PostListProps {
   posts: Post[];
   loading: boolean;
-  authorsMap: { [uid: string]: { username: string; linkedIn?: string } };
 }
 
-const AllPosts: React.FC<AllPostsProps> = ({ posts, loading, authorsMap }) => {
+const getValidImageUrl = (url: string | undefined) => {
+  const placeholder = "https://placehold.co/600x400/090d1f/E0C600/png?text=CoffeeScript";
+  if (!url || url.trim() === '') return placeholder;
+  try {
+    new URL(url);
+    return url;
+  } catch {
+    return placeholder;
+  }
+};
+
+const AllPosts: React.FC<PostListProps> = ({ posts, loading }) => {
   if (loading && posts.length === 0) {
     return (
       <div className="grid gap-6">
         {[...Array(6)].map((_, index) => (
-          <div key={index} className="bg-transparent rounded overflow-hidden">
+          <div key={index} className="bg-[#0c1023] rounded-xl overflow-hidden border border-gray-800/50">
             <Skeleton
               height={320}
-              baseColor="#2c2c2c"
-              highlightColor="#444"
-              className="rounded"
+              baseColor="#1a1f35"
+              highlightColor="#252b47"
+              className="rounded-t-xl"
             />
-            <div className="p-4">
+            <div className="p-6">
               <Skeleton
                 height={20}
-                width="60%"
-                baseColor="#2c2c2c"
-                highlightColor="#444"
+                width="40%"
+                baseColor="#1a1f35"
+                highlightColor="#252b47"
               />
               <Skeleton
                 height={30}
                 width="80%"
-                className="mt-2 rounded"
-                baseColor="#2c2c2c"
-                highlightColor="#444"
+                className="mt-3"
+                baseColor="#1a1f35"
+                highlightColor="#252b47"
               />
               <Skeleton
-                count={3}
-                className="mt-2 rounded"
-                baseColor="#2c2c2c"
-                highlightColor="#444"
+                count={2}
+                className="mt-3"
+                baseColor="#1a1f35"
+                highlightColor="#252b47"
               />
             </div>
           </div>
@@ -59,79 +71,85 @@ const AllPosts: React.FC<AllPostsProps> = ({ posts, loading, authorsMap }) => {
       </div>
     );
   }
+
   return (
-    <div className="grid gap-6">
-      {posts.map((post) => (
-        <div key={post.id} className="bg-transparent rounded overflow-hidden">
-          <div className="w-full h-80">
-            {post.thumbnailUrl ? (
-              <img
-                src={post.thumbnailUrl}
+    <div className="grid gap-8">
+      {posts.map((post, index) => (
+        <motion.div
+          key={post.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: index * 0.1 }}
+          className="bg-[#0c1023] rounded-xl overflow-hidden border border-gray-800/50
+            hover:border-[#E0C600]/30 transition-all duration-300
+            hover:shadow-[0_0_15px_rgba(224,198,0,0.1)] group"
+        >
+          <Link href={`/posts/${post.id}`} className="block">
+            <div className="relative w-full h-80 overflow-hidden">
+              <Image
+                src={getValidImageUrl(post.thumbnailUrl)}
                 alt={post.title}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
               />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-700">
-                <span className="text-white">Image not available</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0c1023] via-transparent to-transparent" />
+            </div>
+            
+            <div className="p-6">
+              <div className="flex items-center gap-4 text-sm text-gray-400 mb-3">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-[#E0C600] rounded-full"></span>
+                  {new Date(post.timestamp.seconds * 1000).toLocaleDateString("es-ES", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                  })}
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-[#E0C600] rounded-full"></span>
+                  {post.author}
+                </span>
               </div>
-            )}
-          </div>
-          <div className="p-4">
-            <p className="text-sm text-gray-500">
-              {new Date(post.timestamp.seconds * 1000).toLocaleDateString(
-                "en-US",
-                {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                }
-              )}
-            </p>
-            <Link href={`/posts/${post.id}`}>
-              <span className="block text-2xl font-bold mt-2 cursor-pointer">
+
+              <h2 className="text-2xl font-bold text-white group-hover:text-[#E0C600] 
+                transition-colors duration-300 mb-3">
                 {post.title}
-              </span>
-            </Link>
-            <p className="text-gray-600 mt-2">
-              {post.shortDescription || "No description available"}
-            </p>
-            <div className="flex flex-wrap mt-4 gap-2">
-              {post.categories.map((category, index) => (
-                <span
-                  key={index}
-                  className="bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full"
-                >
-                  {category}
-                </span>
-              ))}
-            </div>
-            <div>
-              <span className="text-sm text-gray-500 mt-4 inline-block">
-                by {authorsMap[post.authorUid]?.username || "Unknown"}
-              </span>
-              {authorsMap[post.authorUid]?.linkedIn && (
-                <span className="text-sm text-blue-500 ml-2 inline-block">
-                  <a
-                    href={authorsMap[post.authorUid].linkedIn}
-                    target="_blank"
-                    rel="noopener noreferrer"
+              </h2>
+
+              <p className="text-gray-300 mb-4 line-clamp-2">
+                {post.shortDescription || "No description available"}
+              </p>
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                {post.categories.map((category, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-[#E0C600]/10 text-[#E0C600] text-xs 
+                      font-medium rounded-full border border-[#E0C600]/20"
                   >
-                    LinkedIn
-                  </a>
-                </span>
-              )}
-            </div>
-            <Link href={`/posts/${post.id}`}>
-              <span className="text-sm text-blue-500 mt-4 cursor-pointer inline-block">
-                Read more...
+                    {category}
+                  </span>
+                ))}
+              </div>
+
+              <span className="inline-flex items-center gap-2 text-[#E0C600] text-sm
+                group-hover:gap-3 transition-all duration-300">
+                Leer más
+                <svg 
+                  className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </span>
-            </Link>
-          </div>
-        </div>
+            </div>
+          </Link>
+        </motion.div>
       ))}
     </div>
   );
 };
-
 export default AllPosts;

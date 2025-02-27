@@ -1,7 +1,6 @@
 // services/auth/loginHook.ts
 import { loginWithEmail, getOrCreateUserDocument } from "../services/auth/firebaseAuthService";
 import { setUser } from "@/redux/slices/userSlice";
-import { setUserSession } from "@/services/auth/sessions";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useDispatch } from "react-redux";
 
@@ -42,10 +41,10 @@ export const loginHook = async ({
     // Intenta iniciar sesión con email y contraseña
     const user = await loginWithEmail(email, password);
     // Obtiene (o crea) el documento del usuario en Firestore
-    const userData = await getOrCreateUserDocument({ uid: user.uid});
+    const userData = await getOrCreateUserDocument({ uid: user.uid, email: user.email });
     // Actualiza el estado global (Redux)
     dispatch(setUser(userData));
-    await setUserSession(userData.uid);
+   
     // Limpia los campos del formulario
     setEmail("");
     setPassword("");

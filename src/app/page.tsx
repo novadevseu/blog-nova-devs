@@ -8,7 +8,6 @@ import {
   limit,
   startAfter,
   DocumentData,
-  where,
 } from "firebase/firestore";
 import { db } from "../config/firebase-config";
 
@@ -18,8 +17,7 @@ import AllPosts from "@/app/AllPosts";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-// Importa react-select para el multi-select
-import Select from "react-select";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Post {
   id: string;
@@ -29,17 +27,42 @@ interface Post {
   timestamp: { seconds: number; nanoseconds: number };
   thumbnailUrl: string;
   categories: string[];
-  authorUid: string;
+  author: string;
 }
 
-interface FilterState {
-  title: string;
-  categories: string[];
-  startDate: string;
-  endDate: string;
-}
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
 
-const POSTS_PER_PAGE = 6; // Posts por página para paginación (para el listado principal)
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut"
+    }
+  }
+};
+
+const heroVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut"
+    }
+  }
+};
 
 const HomePage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -48,27 +71,8 @@ const HomePage: React.FC = () => {
   const [lastVisible, setLastVisible] = useState<DocumentData | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
-  // Estados temporales para los filtros (mientras se editan)
-  const [tempTitle, setTempTitle] = useState("");
-  const [tempCategories, setTempCategories] = useState<string[]>([]);
-  const [tempStartDate, setTempStartDate] = useState("");
-  const [tempEndDate, setTempEndDate] = useState("");
 
-  // Estados aplicados (se usan para filtrar)
-  const [appliedFilters, setAppliedFilters] = useState<FilterState>({
-    title: "",
-    categories: [],
-    startDate: "",
-    endDate: "",
-  });
-
-  // Estado para la página actual (paginación para el listado principal)
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // Mapa de datos de autores (se llena en fetchPosts)
-  const [authorsMap, setAuthorsMap] = useState<{
-    [uid: string]: { username: string; linkedIn?: string };
-  }>({});
+  const POSTS_PER_PAGE = 6; // Load 6 posts per page
 
   const fetchPosts = async (reset = false) => {
     setLoading(true);
@@ -99,26 +103,6 @@ const HomePage: React.FC = () => {
       setPosts((prevPosts) => (reset ? newPosts : [...prevPosts, ...newPosts]));
       setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
       setHasMore(snapshot.docs.length === POSTS_PER_PAGE);
-
-      // Extraer UIDs únicos de los posts recién cargados
-      const uids = Array.from(new Set(newPosts.map((post) => post.authorUid)));
-      if (uids.length > 0) {
-        const usersRef = collection(db, "users");
-        // Nota: La consulta "in" soporta hasta 10 elementos
-        const qUsers = query(usersRef, where("uid", "in", uids));
-        const usersSnapshot = await getDocs(qUsers);
-        const newAuthors: {
-          [uid: string]: { username: string; linkedIn?: string };
-        } = {};
-        usersSnapshot.forEach((doc) => {
-          const data = doc.data();
-          newAuthors[data.uid] = {
-            username: data.username,
-            linkedIn: data.linkedIn,
-          };
-        });
-        setAuthorsMap((prev) => ({ ...prev, ...newAuthors }));
-      }
     } catch (err) {
       console.error("Error fetching posts:", err);
       setError("There was an error loading the posts. Please try again later.");
@@ -131,67 +115,13 @@ const HomePage: React.FC = () => {
     fetchPosts(true);
   }, []);
 
-  // Función para filtrar posts según filtros aplicados
-  const filteredPosts = posts.filter((post) => {
-    const matchesTitle =
-      appliedFilters.title.trim() === "" ||
-      post.title.toLowerCase().includes(appliedFilters.title.toLowerCase());
-
-    // Si no se seleccionó ninguna categoría, se muestran todos.
-    // Si se seleccionaron, se verifica que al menos una categoría del post
-    // coincida (condición OR).
-    const matchesCategory =
-      appliedFilters.categories.length === 0 ||
-      appliedFilters.categories.some((selectedCat) =>
-        post.categories.some((cat) =>
-          cat.toLowerCase().includes(selectedCat.toLowerCase())
-        )
-      );
-
-    // Verificar si la fecha del post está dentro del intervalo (si se definieron ambas)
-    let matchesDate = true;
-    if (appliedFilters.startDate && appliedFilters.endDate) {
-      const postDate = new Date(post.timestamp.seconds * 1000);
-      const start = new Date(appliedFilters.startDate);
-      const end = new Date(appliedFilters.endDate);
-      matchesDate = postDate >= start && postDate <= end;
-    }
-    return matchesTitle && matchesCategory && matchesDate;
-  });
-
-  // Para el carrusel, usamos los 4 primeros posts
-  const carouselPosts = posts.slice(0, 4);
-
-  // Para el listado principal, usamos el resto y aplicamos paginación
-  const mainPosts = filteredPosts.slice(4);
-  const totalPages = Math.ceil(mainPosts.length / POSTS_PER_PAGE);
-  const currentPosts = mainPosts.slice(
-    (currentPage - 1) * POSTS_PER_PAGE,
-    currentPage * POSTS_PER_PAGE
-  );
-
-  // Opciones fijas para el select múltiple de categorías
-  const categoryOptions = [
-    { value: "Technology", label: "Technology" },
-    { value: "Health", label: "Health" },
-    { value: "Finance", label: "Finance" },
-    { value: "Education", label: "Education" },
-    { value: "Entertainment", label: "Entertainment" },
-    { value: "News", label: "News" },
-    { value: "Tutorials", label: "Tutorials" },
-    { value: "Projects", label: "Projects" },
-    { value: "Guides", label: "Guides" },
-    { value: "Tips", label: "Tips" },
-  ];
-
   // Sidebar links (dummy data)
   const sidebarLinks = [
     { name: "Home", href: "/" },
     { name: "About Us", href: "/about" },
-    { name: "Archive", href: "/archive" },
-    { name: "LinkedIn", href: "https://www.linkedin.com/company/nova-devs-eu/" },
-    { name: "GitHub", href: "https://github.com/novadevseu" },
-    { name: "Our Website", href: "https://your-portfolio.com" },
+    { name: "Guides", href: "/guides" },
+    { name: "Contact", href: "/contact" },
+    { name: "Our Website", href: "https://example.com" },
   ];
 
   // Function to scroll to top
@@ -199,187 +129,208 @@ const HomePage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Función que se llama al pulsar "Apply Filters"
-  const applyFilters = () => {
-    setAppliedFilters({
-      title: tempTitle,
-      categories: tempCategories,
-      startDate: tempStartDate,
-      endDate: tempEndDate,
-    });
-    setCurrentPage(1); // Reinicia a la página 1 al aplicar filtros
-  };
-
-  const clearFilters = () => {
-    setTempTitle("");
-    setTempCategories([]);
-    setTempStartDate("");
-    setTempEndDate("");
-    setAppliedFilters({
-      title: "",
-      categories: [],
-      startDate: "",
-      endDate: "",
-    });
-    setCurrentPage(1);
-  };
-
   return (
-    <div className="min-h-screen">
-      {/* Banner Section */}
-      <h2
-        className="font-semibold text-center font-sans mb-8 border-t-2 border-b-2 border-white"
-        id="title"
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="min-h-screen pt-24 bg-gradient-to-b from-[#090d1f] to-[#090d1f]/95 text-white"
+    >
+      {/* Hero Banner Section */}
+      <motion.div 
+        variants={heroVariants}
+        className="relative py-16 overflow-hidden border-b border-[#E0C600]/10"
       >
-        Coffee<span style={{ color: "#E0C600" }}>Script</span> & Chill
-      </h2>
+        <motion.div 
+          animate={{ 
+            opacity: [0.05, 0.1, 0.05],
+            scale: [1, 1.02, 1]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+          className="absolute inset-0 bg-[url('/images/grid-pattern.png')] opacity-10"
+        />
+        <div className="container mx-auto px-4">
+          <motion.h1 
+            variants={itemVariants}
+            className="text-4xl md:text-6xl font-bold text-center mb-6 tracking-tight"
+          >
+            Coffee
+            <motion.span
+              animate={{ opacity: [1, 0.7, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-[#E0C600]"
+            >
+              Script
+            </motion.span>
+            <span className="text-gray-400">&</span>
+            Chill
+          </motion.h1>
+          <motion.p 
+            variants={itemVariants}
+            className="text-gray-400 text-center max-w-2xl mx-auto text-lg"
+          >
+            Explora el mundo del desarrollo web a través de historias, tutoriales y experiencias compartidas
+          </motion.p>
+        </div>
+      </motion.div>
 
-      {/* Carousel Section */}
-      <LastPosts
-        posts={carouselPosts}
-        authorsMap={authorsMap}
-        loading={loading && posts.length === 0}
-      />
+      {/* Featured Posts Carousel */}
+      <motion.section 
+        variants={itemVariants}
+        className="py-12 bg-[#090d1f]/50 backdrop-blur-sm"
+      >
+        <div className="container mx-auto px-4">
+          <LastPosts
+            posts={posts.slice(0, 4)}
+            loading={loading && posts.length === 0}
+          />
+        </div>
+      </motion.section>
 
-      {/* Filtros */}
-      <div className="container mx-auto px-4 py-4">
-        <h3 className="text-xl font-semibold mb-4">Filter Posts</h3>
-        <div className="flex flex-wrap gap-4 items-end">
-          {/* Filtro por título */}
-          <div>
-            <label className="block mb-1">Title</label>
-            <input
-              type="text"
-              placeholder="Filter by title"
-              value={tempTitle}
-              onChange={(e) => setTempTitle(e.target.value)}
-              className="text-black px-3 py-2 border border-gray-300 rounded"
-            />
-          </div>
+      {/* Main Content Section */}
+      <motion.div 
+        variants={itemVariants}
+        className="container mx-auto px-4 py-12"
+      >
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Posts Column */}
+          <motion.div 
+            variants={itemVariants}
+            className="lg:w-2/3"
+          >
+            <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+              <span className="w-8 h-0.5 bg-[#E0C600]"></span>
+              Últimos Posts
+            </h2>
+            
+            {loading && posts.length === 0 ? (
+              <div className="space-y-6">
+                <Skeleton count={6} height={200} baseColor="#1a1f35" highlightColor="#252b47" />
+              </div>
+            ) : (
+              <div className="grid gap-6">
+                <AllPosts
+                  posts={posts.slice(4)}
+                  loading={loading && posts.length === 0}
+                />
+              </div>
+            )}
 
-          {/* Filtro por categorías usando react-select */}
-          <div className="min-w-[200px]">
-            <label className="block mb-1">Categories</label>
-            <Select
-              isMulti
-              options={categoryOptions}
-              value={categoryOptions.filter((opt) =>
-                tempCategories.includes(opt.value)
+<AnimatePresence>
+              {hasMore && !loading && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="flex justify-center mt-12"
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => fetchPosts()}
+                    className="px-6 py-3 bg-[#E0C600] text-[#090d1f] rounded-lg
+                      font-semibold transition-all duration-300
+                      hover:bg-[#E0C600]/90
+                      shadow-[0_0_15px_rgba(224,198,0,0.3)]
+                      hover:shadow-[0_0_20px_rgba(224,198,0,0.4)]"
+                  >
+                    Cargar Más
+                  </motion.button>
+                </motion.div>
               )}
-              onChange={(selected) =>
-                setTempCategories(selected.map((option) => option.value))
-              }
-              className="text-black"
-            />
-          </div>
+            </AnimatePresence>
+          </motion.div>
 
-          {/* Filtro por intervalo de fecha */}
-          <div>
-            <label className="block mb-1">Start Date</label>
-            <input
-              type="date"
-              value={tempStartDate}
-              onChange={(e) => setTempStartDate(e.target.value)}
-              className="text-black px-3 py-2 border border-gray-300 rounded"
-            />
-          </div>
-          <div>
-            <label className="block mb-1">End Date</label>
-            <input
-              type="date"
-              value={tempEndDate}
-              onChange={(e) => setTempEndDate(e.target.value)}
-              className="text-black px-3 py-2 border border-gray-300 rounded"
-            />
-          </div>
-
-          {/* Botones para aplicar/limpiar filtros */}
-          <div className="flex gap-2">
-            <button
-              onClick={applyFilters}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          {/* Sidebar */}
+          <motion.div 
+            variants={itemVariants}
+            className="lg:w-1/3"
+          >
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              className="sticky top-24 bg-[#0c1023] rounded-xl p-6 border border-gray-800/50
+                shadow-lg backdrop-blur-sm"
             >
-              Apply Filters
-            </button>
-            <button
-              onClick={clearFilters}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Clear Filters
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Listado de posts con paginación */}
-      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
-        {/* Left Column (Posts) */}
-        <div className="w-full md:w-1/2">
-          <h2 className="text-2xl font-bold mb-4">Posts</h2>
-          {loading && posts.length === 0 ? (
-            <Skeleton count={6} height={200} />
-          ) : (
-            <AllPosts
-              posts={currentPosts}
-              authorsMap={authorsMap}
-              loading={loading && posts.length === 0}
-            />
-          )}
-
-          {/* Controles de paginación */}
-          <div className="flex justify-center items-center mt-8 gap-4">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span>
-              Page {currentPage} of {totalPages || 1}
-            </span>
-            <button
-              onClick={() =>
-                setCurrentPage((prev) =>
-                  prev < totalPages ? prev + 1 : prev
-                )
-              }
-              disabled={currentPage === totalPages || totalPages === 0}
-              className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-
-        {/* Right Column (Sticky Sidebar) */}
-        <div className="w-full md:w-1/2">
-          <div className="p-4 sticky top-0">
-            <h3 className="text-xl font-semibold mb-4">Learn More</h3>
-            <ul className="space-y-2">
-              {sidebarLinks.map((link, index) => (
-                <li key={index}>
-                  <a href={link.href} className="text-blue-600 hover:underline">
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-8">
-              <button
-                onClick={scrollToTop}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              {/* ...existing sidebar content... */}
+              <motion.ul 
+                variants={containerVariants}
+                className="space-y-4"
               >
-                Back to Top
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+                {sidebarLinks.map((link, index) => (
+                  <motion.li
+                    key={index}
+                    variants={itemVariants}
+                    whileHover={{ x: 10 }}
+                    className="transform transition-all duration-300"
+                  >
+                    <a href={link.href} 
+                      className="text-gray-300 hover:text-[#E0C600] flex items-center gap-2"
+                    >
+                      <motion.span
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                        className="w-2 h-2 bg-[#E0C600] rounded-full"
+                      />
+                      {link.name}
+                    </a>
+                  </motion.li>
+                ))}
+              </motion.ul>
 
-      {/* Error Message */}
-      {error && <p className="text-center text-red-500">{error}</p>}
-    </div>
+              <div className="mt-8 pt-8 border-t border-gray-800/50">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={scrollToTop}
+                  className="w-full px-4 py-3 bg-[#090d1f] text-gray-300
+                    rounded-lg transition-all duration-300
+                    hover:text-[#E0C600] hover:shadow-[0_0_15px_rgba(224,198,0,0.2)]
+                    border border-gray-800/50 hover:border-[#E0C600]/50
+                    flex items-center justify-center gap-2"
+                >
+                  <span>Volver arriba</span>
+                  <motion.span 
+                    animate={{ y: [-2, 2, -2] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="text-sm"
+                  >
+                    ↑
+                  </motion.span>
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Error Message with Animation */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-4 right-4 bg-red-500/90 text-white px-6 py-3 rounded-lg
+              shadow-lg backdrop-blur-sm"
+          >
+            <motion.p 
+              animate={{ x: [0, -2, 2, -2, 0] }}
+              transition={{ duration: 0.5 }}
+              className="flex items-center gap-2"
+            >
+              <span>⚠️</span>
+              {error}
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

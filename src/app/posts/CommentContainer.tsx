@@ -3,222 +3,205 @@ import { UserType } from "@/redux/slices/userSlice";
 import { addCommentHook } from "@/services/comments/addCommentHooks";
 import { deleteCommentHook } from "@/services/comments/deleteCommentHook";
 import { fetchCommentsHook } from "@/services/comments/fetchCommentsHook";
-import { Comment } from "@/types/CommentType";
+import { Comment } from "@/types/CommentType"
 import { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "@firebase/firestore";
-import { db } from "@/config/firebase-config";
 
 interface CommentContainerInterface {
-  id: string; // Este id corresponde al postId
+    id : string
 }
 
-function CommentContainer({ id }: CommentContainerInterface) {
-  const [currentUser, setCurrentUser] = useState<null | UserType>(useUser());
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [userUid, setUserUid] = useState<string | null>(null);
-  const [newComment, setNewComment] = useState("");
-  const [replyComment, setReplyComment] = useState("");
-  const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [usernames, setUsernames] = useState<{ [uid: string]: string }>({});
+function CommentContainer(
+    {
+        id,
+    } : CommentContainerInterface
+){
 
-  // Efecto para subscribirse a los comentarios.
-  useEffect(() => {
-    const unsubscribeComments = fetchCommentsHook({ id, setComments });
-    return () => unsubscribeComments();
-  }, [id]);
+    const [currentUser,setCurrentUser] = useState<null | UserType>(useUser());
+    const [userRole, setUserRole] = useState<string | null>(null);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
+    const [newComment, setNewComment] = useState("");
+    const [replyComment,setReplyComment] = useState("");
+    const [selectedCommentId,setSelectedCommentId] = useState<string | null>(null);
+    const [comments, setComments] = useState<Comment[]>([]);
 
-  // Efecto para cargar datos del usuario actual.
-  useEffect(() => {
-    if (currentUser) {
-      setUserRole(currentUser.role);
-      setUserUid(currentUser.uid);
+    useEffect(() => {
+      
+        const fetchUserRole = async () => {
+            if (currentUser) {
+              try {
+                  setUserRole(currentUser.role);
+                  setUserEmail(currentUser.email);
+                }
+               catch (err) {
+                console.error("Error loading user role:", err);
+              }
+            }
+        };
+    
+        const unsubscribeComments = fetchCommentsHook({id,setComments});
+        fetchUserRole();
+        return () => unsubscribeComments();
+    }, [id]);
+
+    const handleAddComment = async (e : React.FormEvent) => {
+      if(!userEmail)
+        alert("You need to log in to comment!")
+      await addCommentHook({e,id,newComment,setNewComment,userEmail,selectedCommentId : null});
     }
-  }, [currentUser]);
 
-  // Efecto para obtener los nombres de usuario antes de renderizar
-  useEffect(() => {
-    // Extraemos UIDs de comentarios y respuestas.
-    const uidSet = new Set<string>();
-    comments.forEach((comment) => {
-      uidSet.add(comment.userUid);
-      if (comment.replies && comment.replies.length > 0) {
-        comment.replies.forEach((reply) => uidSet.add(reply.userUid));
-      }
-    });
-    const uids = Array.from(uidSet);
-    if (uids.length === 0) return;
-
-    // Nota: La consulta "in" tiene un límite de 10 elementos.
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("uid", "in", uids));
-    getDocs(q)
-      .then((snapshot) => {
-        const fetchedUsernames: { [uid: string]: string } = {};
-        snapshot.docs.forEach((doc) => {
-          const data = doc.data();
-          // Suponiendo que el documento tiene los campos "uid" y "username".
-          fetchedUsernames[data.uid] = data.username;
-        });
-        setUsernames(fetchedUsernames);
-      })
-      .catch((error) => {
-        console.error("Error fetching usernames: ", error);
-      });
-  }, [comments]);
-
-  const handleAddComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!userUid) {
-      alert("You need to log in to comment!");
-      return;
+    const handleReplyComment = async (e : React.FormEvent) => {
+      if(!userEmail)
+        alert("You need to log in to comment!")
+      await addCommentHook({e,id,newComment : replyComment,selectedCommentId,setNewComment,userEmail})
     }
-    await addCommentHook({
-      e,
-      id, // postId
-      newComment,
-      setNewComment,
-      userUid,
-      selectedCommentId: null,
-    });
-  };
 
-  const handleReplyComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!userUid) {
-      alert("You need to log in to comment!");
-      return;
+    const handleDeleteComment = async (commentId : string) => {
+      await deleteCommentHook(commentId);
     }
-    await addCommentHook({
-      e,
-      id,
-      newComment: replyComment,
-      selectedCommentId,
-      setNewComment,
-      userUid,
-    });
-  };
 
-  const handleDeleteComment = async (commentId: string) => {
-    await deleteCommentHook(commentId);
-  };
+    return (
+      <div className="mt-6 space-y-8">
+          <div className="bg-[#0c1023] rounded-xl p-6 border border-gray-800/50">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <span className="w-4 h-0.5 bg-[#E0C600]"></span>
+                  Comentarios
+                  <span className="text-sm text-gray-400">({comments.length})</span>
+              </h2>
 
-  return (
-    <div className="mt-6">
-      <h2 className="text-xl font-semibold mb-4">Comments</h2>
-
-      <form onSubmit={handleAddComment} className="mb-6">
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Write your comment..."
-          className="w-full p-3 border border-gray-300 rounded-md mb-2"
-          style={{ color: "black" }}
-          rows={3}
-        ></textarea>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700"
-        >
-          Comment
-        </button>
-      </form>
-
-      {comments.map((comment: Comment) => (
-        <div key={comment.id} className="border-gray-200 pb-4 mb-4">
-          {/* Mostramos el username en lugar del userUid */}
-          <p className="text-sm font-medium">
-            {usernames[comment.userUid] || comment.userUid}
-          </p>
-          <p className="text-gray-700">{comment.content}</p>
-          <p className="text-xs text-gray-500">
-            {new Date(comment.timestamp.seconds * 1000).toLocaleString()}
-          </p>
-          {selectedCommentId === comment.id && (
-            <form>
-              <textarea
-                value={replyComment}
-                onChange={(e) => setReplyComment(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md mb-2"
-                style={{ color: "black" }}
-                rows={3}
-              ></textarea>
-            </form>
-          )}
-          <div className="flex items-center gap-5 mt-2 border-b pb-5">
-            {selectedCommentId !== comment.id ? (
-              <>
-                <button
-                  onClick={() => setSelectedCommentId(comment.id)}
-                  className="text-blue-500 text-sm"
-                >
-                  Reply
-                </button>
-                {userRole === "Admin" && (
+              {/* Comment Form */}
+              <form onSubmit={handleAddComment} className="space-y-4">
+                  <textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Escribe tu comentario..."
+                      className="w-full p-4 bg-[#090d1f] border border-gray-800/50 rounded-lg
+                          text-gray-300 placeholder-gray-500 focus:border-[#E0C600]/50
+                          focus:outline-none focus:ring-1 focus:ring-[#E0C600]/30
+                          transition-all duration-300"
+                      rows={3}
+                  />
                   <button
-                    onClick={() => handleDeleteComment(comment.id)}
-                    className="text-red-500 text-sm"
+                      type="submit"
+                      className="px-6 py-2.5 bg-[#E0C600] text-[#090d1f] rounded-lg
+                          font-semibold transition-all duration-300
+                          hover:bg-[#E0C600]/90 hover:scale-105
+                          shadow-[0_0_15px_rgba(224,198,0,0.2)]
+                          hover:shadow-[0_0_20px_rgba(224,198,0,0.3)]
+                          disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={!userEmail}
                   >
-                    Delete
+                      {userEmail ? "Comentar" : "Inicia sesión para comentar"}
                   </button>
-                )}
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={(e) => {
-                    handleReplyComment(e);
-                    setReplyComment("");
-                  }}
-                  className="text-blue-500 text-sm"
-                >
-                  Submit
-                </button>
-                {userRole === "Admin" && (
-                  <button
-                    onClick={() => {
-                      setSelectedCommentId(null);
-                      setReplyComment("");
-                    }}
-                    className="text-red-500 text-sm"
-                  >
-                    Cancel
-                  </button>
-                )}
-              </>
-            )}
+              </form>
           </div>
-          {comment.replies && comment.replies.length >= 1 && (
-            <div>
-              {comment.replies.map((innerComment: Comment) => (
-                <div
-                  key={innerComment.id}
-                  className="border-b border-gray-200 pb-4 mt-6 ml-10"
-                >
-                  <p className="text-sm font-medium">
-                    {usernames[innerComment.userUid] || innerComment.userUid}
-                  </p>
-                  <p className="text-gray-700">{innerComment.content}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(innerComment.timestamp.seconds * 1000).toLocaleString()}
-                  </p>
-                  {(userRole === "Admin" ||
-                    (userUid && userUid === innerComment.userUid)) && (
-                    <button
-                      onClick={() => handleDeleteComment(innerComment.id)}
-                      className="text-red-500 text-sm"
-                    >
-                      Delete
-                    </button>
-                  )}
-                </div>
+
+          {/* Comments List */}
+          <div className="space-y-6">
+              {comments.map((comment: Comment) => (
+                  <div key={comment.id} className="bg-[#0c1023] rounded-xl p-6 border border-gray-800/50
+                      transition-all duration-300 hover:border-gray-700/50">
+                      <div className="flex justify-between items-start mb-3">
+                          <p className="font-medium text-[#E0C600]">{comment.email}</p>
+                          <p className="text-xs text-gray-500">
+                              {new Date(comment.timestamp.seconds * 1000).toLocaleString()}
+                          </p>
+                      </div>
+                      <p className="text-gray-300 mb-4">{comment.content}</p>
+
+                      {/* Reply Form */}
+                      {selectedCommentId === comment.id && (
+                          <form className="mt-4 space-y-4">
+                              <textarea
+                                  value={replyComment}
+                                  onChange={(e) => setReplyComment(e.target.value)}
+                                  className="w-full p-4 bg-[#090d1f] border border-gray-800/50 rounded-lg
+                                      text-gray-300 placeholder-gray-500 focus:border-[#E0C600]/50
+                                      focus:outline-none focus:ring-1 focus:ring-[#E0C600]/30
+                                      transition-all duration-300"
+                                  placeholder="Escribe tu respuesta..."
+                                  rows={2}
+                              />
+                          </form>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-4 mt-4">
+                          {selectedCommentId !== comment.id ? (
+                              <>
+                                  <button
+                                      onClick={() => setSelectedCommentId(comment.id)}
+                                      className="text-sm text-[#E0C600] hover:text-[#E0C600]/80
+                                          transition-colors duration-300"
+                                  >
+                                      Responder
+                                  </button>
+                                  {userRole === "Admin" && (
+                                      <button
+                                          onClick={() => handleDeleteComment(comment.id)}
+                                          className="text-sm text-red-500 hover:text-red-400
+                                              transition-colors duration-300"
+                                      >
+                                          Eliminar
+                                      </button>
+                                  )}
+                              </>
+                          ) : (
+                              <>
+                                  <button
+                                      onClick={(e) => {
+                                          handleReplyComment(e);
+                                          setReplyComment("");
+                                      }}
+                                      className="text-sm text-[#E0C600] hover:text-[#E0C600]/80
+                                          transition-colors duration-300"
+                                  >
+                                      Enviar
+                                  </button>
+                                  <button
+                                      onClick={() => {
+                                          setSelectedCommentId(null);
+                                          setReplyComment("");
+                                      }}
+                                      className="text-sm text-red-500 hover:text-red-400
+                                          transition-colors duration-300"
+                                  >
+                                      Cancelar
+                                  </button>
+                              </>
+                          )}
+                      </div>
+
+                      {/* Replies */}
+                      {comment.replies && comment.replies.length > 0 && (
+                          <div className="mt-6 space-y-4 pl-6 border-l-2 border-gray-800/50">
+                              {comment.replies.map((reply: Comment) => (
+                                  <div key={reply.id} className="bg-[#090d1f] rounded-lg p-4
+                                      border border-gray-800/30">
+                                      <div className="flex justify-between items-start mb-2">
+                                          <p className="font-medium text-[#E0C600]">{reply.email}</p>
+                                          <p className="text-xs text-gray-500">
+                                              {new Date(reply.timestamp.seconds * 1000).toLocaleString()}
+                                          </p>
+                                      </div>
+                                      <p className="text-gray-300">{reply.content}</p>
+                                      {((userRole === "Admin") || (userEmail && userEmail === reply.email)) && (
+                                          <button
+                                              onClick={() => handleDeleteComment(reply.id)}
+                                              className="mt-2 text-sm text-red-500 hover:text-red-400
+                                                  transition-colors duration-300"
+                                          >
+                                              Eliminar
+                                          </button>
+                                      )}
+                                  </div>
+                              ))}
+                          </div>
+                      )}
+                  </div>
               ))}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
+          </div>
+      </div>
   );
 }
 
-export default CommentContainer;
+export default CommentContainer
