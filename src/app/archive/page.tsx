@@ -46,13 +46,13 @@ const Archive: React.FC = () => {
     fetchAllPosts();
   }, []);
 
-  // Filtrar posts basado en búsqueda y categoría
-  const filteredPosts = posts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "all" || post.categories?.includes(selectedCategory);
-    return matchesSearch && matchesCategory;
-  });
+    // Filtrar posts basado en búsqueda y categoría
+    const filteredPosts = posts.filter(post => {
+      const matchesSearch = (post.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           post.author?.toLowerCase().includes(searchTerm.toLowerCase())) ?? false;
+      const matchesCategory = selectedCategory === "all" || post.categories?.includes(selectedCategory);
+      return matchesSearch && matchesCategory;
+    });
 
   if (loading) {
     return (
