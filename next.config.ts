@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['placehold.co', 'cdn.worldvectorlogo.com'], // Añade aquí todos los dominios que necesites
+    domains: ['placehold.co', 'cdn.worldvectorlogo.com' ,'www.gstatic.com'], 
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'media.licdn.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'external-content.duckduckgo.com',
       },
     ],
   },

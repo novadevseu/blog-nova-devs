@@ -7,16 +7,105 @@ import { googleLoginHook } from "@/hooks/googleLoginHook";
 import { githubLoginHook } from "@/hooks/githubLoginHook";
 import { yahooLoginHook } from "@/hooks/yahooLoginHook";
 
+interface ValidationErrors {
+  email: string;
+  password: string;
+}
+
 const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({
+    email: "",
+    password: "",
+  });
+  const [touched, setTouched] = useState({
+    email: false,
+    password: false,
+  });
   const router = useRouter();
   const dispatch = useDispatch();
 
+  const validateEmail = (email: string): string => {
+    if (!email) return "El email es requerido";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return "El formato del email no es válido";
+    }
+    return "";
+  };
+
+  const validatePassword = (password: string): string => {
+    if (!password) return "La contraseña es requerida";
+    if (password.length < 6) {
+      return "La contraseña debe tener al menos 6 caracteres";
+    }
+    if (!/(?=.*[0-9])/.test(password)) {
+      return "La contraseña debe contener al menos un número";
+    }
+    if (!/(?=.*[A-Z])/.test(password)) {
+      return "La contraseña debe contener al menos una mayúscula";
+    }
+    if (!/(?=.*[!@#$%^&*.])/.test(password)) {
+      return "La contraseña debe contener al menos un carácter especial (!@#$%^&*.)";
+    }
+    return "";
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    if (touched.email) {
+      setValidationErrors(prev => ({
+        ...prev,
+        email: validateEmail(newEmail)
+      }));
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    if (touched.password) {
+      setValidationErrors(prev => ({
+        ...prev,
+        password: validatePassword(newPassword)
+      }));
+    }
+  };
+
+  const handleBlur = (field: 'email' | 'password') => {
+    setTouched(prev => ({
+      ...prev,
+      [field]: true
+    }));
+    setValidationErrors(prev => ({
+      ...prev,
+      [field]: field === 'email' ? validateEmail(email) : validatePassword(password)
+    }));
+  };
+
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar todos los campos antes de enviar
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
+    
+    setValidationErrors({
+      email: emailError,
+      password: passwordError,
+    });
+    
+    setTouched({
+      email: true,
+      password: true,
+    });
+
+    if (emailError || passwordError) {
+      return;
+    }
     await useSignUp({
       email,
       password,
@@ -83,39 +172,60 @@ const SignUpPage: React.FC = () => {
         <div className="bg-[#0c1023] p-8 rounded-xl shadow-[0_0_15px_rgba(224,198,0,0.1)] w-full max-w-md 
           transform transition-all duration-300 border border-gray-800/50 hover:border-[#E0C600]/30">
           <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-[#E0C600] to-[#c4ad00] bg-clip-text text-transparent">
-            Registro
+            Sign Up
           </h2>
           <form onSubmit={handleEmailSignUp} className="space-y-6">
-            <div className="transition-all duration-200">
-              <label htmlFor="email" className="block text-sm font-medium mb-2 text-gray-300">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="mt-1 block w-full px-4 py-3 border border-gray-800/50 rounded-lg shadow-sm 
-                  focus:outline-none focus:ring-2 focus:ring-[#E0C600]/50 focus:border-transparent
-                  bg-[#090d1f] transition-all duration-200 hover:border-[#E0C600]/30"
-              />
-            </div>
-            <div className="transition-all duration-200">
-              <label htmlFor="password" className="block text-sm font-medium mb-2 text-gray-300">
-                Contraseña
-              </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="mt-1 block w-full px-4 py-3 border border-gray-800/50 rounded-lg shadow-sm 
-                  focus:outline-none focus:ring-2 focus:ring-[#E0C600]/50 focus:border-transparent
-                  bg-[#090d1f] transition-all duration-200 hover:border-[#E0C600]/30"
-              />
-            </div>
+          <div className="transition-all duration-200">
+        <label htmlFor="email" className="block text-sm font-medium mb-2 text-gray-300">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          value={email}
+          onChange={handleEmailChange}
+          onBlur={() => handleBlur('email')}
+          required
+          className={`mt-1 block w-full px-4 py-3 border rounded-lg shadow-sm 
+            focus:outline-none focus:ring-2 focus:ring-[#E0C600]/50 focus:border-transparent
+            bg-[#090d1f] transition-all duration-200
+            ${touched.email && validationErrors.email 
+              ? 'border-red-500 hover:border-red-400' 
+              : 'border-gray-800/50 hover:border-[#E0C600]/30'
+            }`}
+        />
+        {touched.email && validationErrors.email && (
+          <p className="mt-2 text-sm text-red-400 animate-fadeIn">
+            {validationErrors.email}
+          </p>
+        )}
+      </div>
+
+      <div className="transition-all duration-200">
+        <label htmlFor="password" className="block text-sm font-medium mb-2 text-gray-300">
+          Contraseña
+        </label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          onChange={handlePasswordChange}
+          onBlur={() => handleBlur('password')}
+          required
+          className={`mt-1 block w-full px-4 py-3 border rounded-lg shadow-sm 
+            focus:outline-none focus:ring-2 focus:ring-[#E0C600]/50 focus:border-transparent
+            bg-[#090d1f] transition-all duration-200
+            ${touched.password && validationErrors.password 
+              ? 'border-red-500 hover:border-red-400' 
+              : 'border-gray-800/50 hover:border-[#E0C600]/30'
+            }`}
+        />
+        {touched.password && validationErrors.password && (
+          <p className="mt-2 text-sm text-red-400 animate-fadeIn">
+            {validationErrors.password}
+          </p>
+        )}
+      </div>
             {error && (
               <div className="bg-red-900/50 text-red-400 p-4 rounded-lg text-sm mt-4 border border-red-800
                 animate-fadeIn transition-all duration-300">
