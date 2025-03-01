@@ -1,276 +1,216 @@
 "use client";
-
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../config/firebase-config";
-import dynamic from "next/dynamic";
-import { useUser } from "@/hooks/useUser";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
-// Cargar el editor dinámicamente para evitar problemas de SSR
-const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
+const categoriesList = [
+  "Technology",
+  "Health",
+  "Finance",
+  "Education",
+  "Entertainment",
+  "News",
+  "Tutorials",
+  "Projects",
+  "Guides",
+  "Tips",
+];
 
-const formVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: { opacity: 1, x: 0 },
-};
-
-const CreatePost: React.FC = () => {
+const CreatePost = () => {
+  const [step, setStep] = useState(1);
   const [title, setTitle] = useState("");
   const [shortDescription, setShortDescription] = useState("");
-  const [content, setContent] = useState<string | undefined>("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [categorySearch, setCategorySearch] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
-  const [categories, setCategories] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const user = useUser();
-  const [error, setError] = useState("");
-  const [showPreview, setShowPreview] = useState(false);
+  const [content, setContent] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const validateForm = () => {
-    if (!title.trim()) return "El título es requerido";
-    if (!shortDescription.trim()) return "La descripción corta es requerida";
-    if (!content) return "El contenido es requerido";
-    if (!thumbnailUrl.trim()) return "La URL de la miniatura es requerida";
-    if (categories.length === 0) return "Selecciona al menos una categoría";
-    return "";
-  };
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: "<p>Start writing your post here...</p>",
+    onUpdate: ({ editor }) => {
+      setContent(editor.getHTML());
+    },
+  });
 
-  const handleCreatePost = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const docRef = await addDoc(collection(db, "posts"), {
-        title,
-        shortDescription,
-        content,
-        thumbnailUrl,
-        categories,
-        author: user?.email,
-        timestamp: new Date(),
-      });
-
-      // Redirige al detalle del post recién creado
-      router.push(`/posts/${docRef.id}`);
-    } catch (error) {
-      setError("Error al crear el post. Por favor, intenta de nuevo.");
-      console.error("Error creating post:", error);
-    } finally {
-      setLoading(false);
+  const handleNext = () => {
+    if (
+      (step === 1 && title && shortDescription) ||
+      (step === 2 && selectedCategories.length > 0) ||
+      (step === 3 && thumbnailUrl) ||
+      (step === 4 && content.trim() !== "<p></p>")
+    ) {
+      setStep((prev) => Math.min(prev + 1, 4));
     }
   };
 
-  const handleCategoryChange = (category: string) => {
-    setCategories((prevCategories) =>
-      prevCategories.includes(category)
-        ? prevCategories.filter((cat) => cat !== category)
-        : [...prevCategories, category]
-    );
+  const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
+
+  const handleCategorySelect = (category: string) => {
+    if (!selectedCategories.includes(category)) {
+      setSelectedCategories((prev) => [...prev, category]);
+    }
+    setCategorySearch("");
+  };
+
+  const handleCategoryRemove = (category: string) => {
+    setSelectedCategories((prev) => prev.filter((c) => c !== category));
+  };
+
+  const handleSubmit = () => {
+    setIsSubmitted(true);
+    setTimeout(() => alert("Post Created Successfully!"), 1500);
   };
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={formVariants}
-      className="min-h-screen pt-28 py-12 px-4 bg-gradient-to-b from-[#090d1f] to-[#090d1f]/95"
-    >
-      <motion.form
-        onSubmit={handleCreatePost}
-        variants={itemVariants}
-        className="w-full max-w-4xl mx-auto bg-[#0c1023] p-8 rounded-xl 
-          shadow-[0_0_15px_rgba(224,198,0,0.1)] border border-gray-800/50 
-          hover:border-[#E0C600]/30 transition-all duration-300"
-      >
-        <motion.h2
-          variants={itemVariants}
-          className="text-3xl font-bold mb-8 text-center bg-gradient-to-r 
-            from-[#E0C600] to-[#c4ad00] bg-clip-text text-transparent"
-        >
-          Crear Nuevo Post
-        </motion.h2>
+    <div className="max-w-4xl mx-auto p-8 bg-gray-900 text-white rounded-xl shadow-lg relative">
+      {/* Progress Bar */}
+      <div className="w-full bg-gray-700 h-3 rounded-full overflow-hidden mb-6">
+        <motion.div
+          className="h-full bg-yellow-500"
+          initial={{ width: "0%" }}
+          animate={{ width: `${(step / 4) * 100}%` }}
+          transition={{ duration: 0.3 }}
+        />
+      </div>
 
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400"
-            >
-              {error}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="space-y-6">
-          {/* Input fields with consistent styling */}
-          {[
-            {
-              id: "title",
-              label: "Título",
-              value: title,
-              setter: setTitle,
-            },
-            {
-              id: "shortDescription",
-              label: "Descripción Corta",
-              value: shortDescription,
-              setter: setShortDescription,
-            },
-            {
-              id: "thumbnailUrl",
-              label: "URL de Miniatura",
-              value: thumbnailUrl,
-              setter: setThumbnailUrl,
-            },
-          ].map((field) => (
-            <motion.div key={field.id} variants={itemVariants} className="mb-4">
-              <label
-                htmlFor={field.id}
-                className="block text-gray-300 text-sm font-medium mb-2"
-              >
-                {field.label}
-              </label>
-              <motion.input
-                whileFocus={{ scale: 1.01 }}
-                id={field.id}
+      {!isSubmitted ? (
+        <>
+          {step === 1 && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Step 1: Title & Description</h2>
+              <input
                 type="text"
-                value={field.value}
-                onChange={(e) => field.setter(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-[#090d1f] text-gray-200 border border-gray-800/50 
-                  rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#E0C600]/50 
-                  focus:border-transparent transition-all duration-200 hover:border-[#E0C600]/30"
+                placeholder="Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full p-3 mb-4 border border-yellow-500 rounded bg-gray-800 text-white"
               />
-            </motion.div>
-          ))}
-
-          {/* Categories Section */}
-          <motion.div variants={itemVariants} className="mb-6">
-            <label className="block text-gray-300 text-sm font-medium mb-3">
-              Categorías
-            </label>
-            <div className="flex flex-wrap gap-3">
-              {[
-                "Tecnología",
-                "Desarrollo",
-                "JavaScript",
-                "React",
-                "Node.js",
-                "Python",
-              ].map((category) => (
-                <motion.button
-                  key={category}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  onClick={() => handleCategoryChange(category)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
-                    ${
-                      categories.includes(category)
-                        ? "bg-[#E0C600] text-[#090d1f] shadow-[0_0_15px_rgba(224,198,0,0.3)]"
-                        : "bg-[#090d1f] text-gray-400 border border-gray-800/50 hover:border-[#E0C600]/30"
-                    }`}
-                >
-                  {category}
-                </motion.button>
-              ))}
+              <textarea
+                placeholder="Short Description"
+                value={shortDescription}
+                onChange={(e) => setShortDescription(e.target.value)}
+                className="w-full p-3 border border-yellow-500 rounded bg-gray-800 text-white h-24"
+              ></textarea>
             </div>
-          </motion.div>
+          )}
 
-          {/* Content Editor */}
-          <motion.div variants={itemVariants} className="mb-6">
-            <label className="block text-gray-300 text-sm font-medium mb-2">
-              Contenido
-            </label>
-            <div data-color-mode="dark">
-              <MDEditor
-                value={content}
-                onChange={setContent}
-                height={400}
-                preview={showPreview ? "preview" : "edit"}
-                className="bg-[#090d1f] border border-gray-800/50 rounded-lg overflow-hidden"
+          {step === 2 && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Step 2: Select Categories</h2>
+              <input
+                type="text"
+                placeholder="Search Categories"
+                value={categorySearch}
+                onChange={(e) => setCategorySearch(e.target.value)}
+                className="w-full p-3 border border-yellow-500 rounded bg-gray-800 text-white"
+              />
+              <div className="mt-2">
+                {categoriesList
+                  .filter((cat) =>
+                    cat.toLowerCase().includes(categorySearch.toLowerCase())
+                  )
+                  .map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => handleCategorySelect(cat)}
+                      className="bg-gray-700 text-yellow-500 px-3 py-1 m-1 rounded-lg transition hover:bg-yellow-500 hover:text-black"
+                    >
+                      {cat}
+                    </button>
+                  ))}
+              </div>
+              <div className="mt-4">
+                {selectedCategories.map((cat) => (
+                  <span
+                    key={cat}
+                    className="bg-yellow-500 text-black px-3 py-1 m-1 rounded-lg inline-flex items-center"
+                  >
+                    {cat}{" "}
+                    <XMarkIcon
+                      className="w-5 h-5 ml-1 cursor-pointer"
+                      onClick={() => handleCategoryRemove(cat)}
+                    />
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Step 3: Upload Thumbnail</h2>
+              <input
+                type="text"
+                placeholder="Thumbnail URL"
+                value={thumbnailUrl}
+                onChange={(e) => setThumbnailUrl(e.target.value)}
+                className="w-full p-3 mb-4 border border-yellow-500 rounded bg-gray-800 text-white"
+              />
+              <img
+                src={thumbnailUrl || "https://static.thenounproject.com/png/1765551-200.png"}
+                alt="Thumbnail Preview"
+                className="w-full h-60 object-cover rounded-lg border border-yellow-500"
               />
             </div>
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowPreview(!showPreview)}
-              className="mt-2 px-4 py-2 text-sm text-gray-400 hover:text-[#E0C600] 
-                transition-colors duration-200"
-            >
-              {showPreview ? "Editar" : "Vista Previa"}
-            </motion.button>
-          </motion.div>
+          )}
 
-          {/* Submit Button */}
-          <motion.button
-            variants={itemVariants}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-300
-              ${
-                loading
-                  ? "bg-gray-600 cursor-not-allowed"
-                  : "bg-[#E0C600] text-[#090d1f] hover:bg-[#E0C600]/90 hover:shadow-[0_0_15px_rgba(224,198,0,0.3)]"
-              }`}
-          >
-            {loading ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Creando Post...
-              </span>
-            ) : (
-              "Crear Post"
+          {step === 4 && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Step 4: Write Content</h2>
+              <div className="w-full p-3 border border-yellow-500 rounded bg-gray-800 text-white min-h-[250px]">
+                <EditorContent editor={editor} />
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between mt-6">
+            {step > 1 && (
+              <button
+                onClick={handleBack}
+                className="px-6 py-3 bg-gray-700 text-yellow-500 rounded-lg transition hover:bg-yellow-500 hover:text-black"
+              >
+                Back
+              </button>
             )}
-          </motion.button>
-        </div>
-      </motion.form>
-    </motion.div>
+            {step < 4 ? (
+              <button
+                onClick={handleNext}
+                disabled={
+                  (step === 1 && (!title || !shortDescription)) ||
+                  (step === 2 && selectedCategories.length === 0) ||
+                  (step === 3 && !thumbnailUrl) ||
+                  (step === 4 && content.trim() === "<p></p>")
+                }
+                className={`px-6 py-3 rounded-lg transition ${
+                  (step === 1 && (!title || !shortDescription)) ||
+                  (step === 2 && selectedCategories.length === 0) ||
+                  (step === 3 && !thumbnailUrl) ||
+                  (step === 4 && content.trim() === "<p></p>")
+                    ? "bg-gray-500 cursor-not-allowed"
+                    : "bg-yellow-500 text-black hover:bg-yellow-600"
+                }`}
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                className="px-6 py-3 bg-yellow-500 text-black rounded-lg transition hover:bg-yellow-600"
+              >
+                Create Post
+              </button>
+            )}
+          </div>
+        </>
+      ) : (
+        <h2 className="text-3xl font-bold text-center text-green-500 mt-10">🎉 Post Created Successfully!</h2>
+      )}
+    </div>
   );
 };
 
