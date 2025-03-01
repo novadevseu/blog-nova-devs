@@ -66,7 +66,7 @@ const CreatePost = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-gray-900 text-white rounded-xl shadow-lg relative">
+    <div className="mt-20 max-w-4xl mx-auto p-8 bg-gray-900 text-white rounded-xl shadow-lg relative">
       {/* Progress Bar */}
       <div className="w-full bg-gray-700 h-3 rounded-full overflow-hidden mb-6">
         <motion.div
