@@ -39,7 +39,7 @@ export const googleLoginHook = async ({
     });
     // Actualiza Redux
     dispatch(setUser(userData));
-    
+
     // Redirige al perfil
     router.push("/profile");
   } catch (error: any) {

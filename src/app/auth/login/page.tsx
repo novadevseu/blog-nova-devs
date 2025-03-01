@@ -12,7 +12,7 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  
+
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -59,26 +59,26 @@ const LoginPage: React.FC = () => {
   };
 
   const providers = [
-    { 
-      name: "Google", 
-      color: "hover:bg-[#0c1023] bg-[#090d1f]", 
-      icon: "/google.svg", 
-      action: handleGoogleSignIn 
+    {
+      name: "Google",
+      color: "hover:bg-[#0c1023] bg-[#090d1f]",
+      icon: "/google.svg",
+      action: handleGoogleSignIn
     },
-    { 
-      name: "GitHub", 
-      color: "hover:bg-[#0c1023] bg-[#090d1f]", 
-      icon: "/github.svg", 
-      action: handleGithubSignIn 
+    {
+      name: "GitHub",
+      color: "hover:bg-[#0c1023] bg-[#090d1f]",
+      icon: "/github.svg",
+      action: handleGithubSignIn
     },
-    { 
-      name: "Yahoo", 
-      color: "hover:bg-[#0c1023] bg-[#090d1f]", 
-      icon: "/yahoo.svg", 
-      action: handleYahooSignIn 
+    {
+      name: "Yahoo",
+      color: "hover:bg-[#0c1023] bg-[#090d1f]",
+      icon: "/yahoo.svg",
+      action: handleYahooSignIn
     },
   ];
-  
+
   return (
     <div className="flex flex-col min-h-screen items-center justify-center px-4 py-8 bg-gradient-to-b from-[#090d1f] to-[#090d1f]/95">
       <div className="flex items-center justify-center w-full">
@@ -128,8 +128,8 @@ const LoginPage: React.FC = () => {
               type="submit"
               disabled={loading}
               className={`w-full py-3 px-4 font-medium rounded-lg shadow-md transition-all duration-200
-                ${loading 
-                  ? "bg-gray-600 cursor-not-allowed" 
+                ${loading
+                  ? "bg-gray-600 cursor-not-allowed"
                   : "bg-[#E0C600] hover:bg-[#E0C600]/90 text-[#090d1f] hover:shadow-[0_0_15px_rgba(224,198,0,0.3)] active:transform active:scale-95"
                 }`}
             >
@@ -144,13 +144,13 @@ const LoginPage: React.FC = () => {
               ) : "Iniciar Sesión"}
             </button>
           </form>
-  
+
           <div className="flex items-center my-8">
             <div className="flex-grow border-t border-gray-800/50"></div>
             <span className="mx-4 font-semibold text-gray-400">o</span>
             <div className="flex-grow border-t border-gray-800/50"></div>
           </div>
-  
+
           <div className="flex justify-center gap-6">
             {providers.map((provider) => (
               <button
@@ -159,30 +159,30 @@ const LoginPage: React.FC = () => {
                 disabled={loading}
                 className={`p-3 rounded-lg shadow-md flex justify-center items-center w-16 h-16
                   transition-all duration-200 transform hover:scale-110 active:scale-95
-                  ${loading 
-                    ? "bg-gray-600 cursor-not-allowed" 
+                  ${loading
+                    ? "bg-gray-600 cursor-not-allowed"
                     : `border border-gray-800/50 hover:border-[#E0C600]/50 ${provider.color}
                       hover:shadow-[0_0_15px_rgba(224,198,0,0.1)]`
                   }`}
               >
                 {loading ? (
-                  <div className="w-5 h-5 border-2 border-[#E0C600]/30 border-t-transparent rounded-full animate-spin"/>
+                  <div className="w-5 h-5 border-2 border-[#E0C600]/30 border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <img src={provider.icon} alt={provider.name} className="w-6 h-6 transition-transform duration-200 filter invert" />
                 )}
               </button>
             ))}
           </div>
-  
+
           <div className="mt-8 text-center text-sm flex justify-between px-2">
-            <button 
-              onClick={() => router.push("/auth/signup")} 
+            <button
+              onClick={() => router.push("/auth/signup")}
               className="text-gray-400 hover:text-[#E0C600] transition-colors duration-200"
             >
               ¿No tienes una cuenta?
             </button>
-            <button 
-              onClick={() => router.push("/auth/forgot-password")} 
+            <button
+              onClick={() => router.push("/auth/forgot-password")}
               className="text-gray-400 hover:text-[#E0C600] transition-colors duration-200"
             >
               ¿Olvidaste tu contraseña?
