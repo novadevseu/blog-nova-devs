@@ -6,13 +6,17 @@ import { loginHook } from "@/hooks/mailLoginHook";
 import { googleLoginHook } from "@/hooks/googleLoginHook";
 import { githubLoginHook } from "@/hooks/githubLoginHook";
 import { yahooLoginHook } from "@/hooks/yahooLoginHook";
-
+import { sendResetPasswordEmail } from "@/services/auth/firebaseAuthService";
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
-  
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -56,6 +60,24 @@ const LoginPage: React.FC = () => {
       router,
       dispatch,
     });
+  };
+  const handleSendResetEmail = async () => {
+    // Reset previous error and message statuses
+    setResetError("");
+    setResetMessage("");
+    setResetLoading(true);
+    try {
+      // Call the service function to send a password reset email
+      await sendResetPasswordEmail(resetEmail);
+      // Display a success message if the email was sent successfully
+      setResetMessage("Reset email sent successfully. Please check your inbox.");
+    } catch (err: any) {
+      // Display an error message if sending fails
+      setResetError("Failed to send reset email. Please try again.");
+      console.error("Error sending reset email:", err);
+    } finally {
+      setResetLoading(false);
+    }
   };
 
   const providers = [
@@ -182,7 +204,7 @@ const LoginPage: React.FC = () => {
               ¿No tienes una cuenta?
             </button>
             <button 
-              onClick={() => router.push("/auth/forgot-password")} 
+              onClick={() => setShowResetDialog(true)}
               className="text-gray-400 hover:text-[#E0C600] transition-colors duration-200"
             >
               ¿Olvidaste tu contraseña?
@@ -190,7 +212,63 @@ const LoginPage: React.FC = () => {
           </div>
         </div>
       </div>
+       {/* Password Reset Dialog */}
+       {showResetDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            {/* Dialog Header */}
+            <h3 className="text-xl font-bold mb-4">Reset Password</h3>
+            {/* Dialog Instruction */}
+            <p className="mb-4 text-sm text-gray-600">
+              Please enter your email address to receive a password reset link.
+            </p>
+            {/* Input for email used in password reset */}
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              className="w-full p-2 mb-4 border border-gray-300 rounded text-black"
+            />
+            {/* Display error message if any */}
+            {resetError && (
+              <div className="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm">
+                {resetError}
+              </div>
+            )}
+            {/* Display success message if email is sent */}
+            {resetMessage && (
+              <div className="bg-green-100 text-green-700 p-2 rounded mb-4 text-sm">
+                {resetMessage}
+              </div>
+            )}
+            <div className="flex justify-end gap-4">
+              {/* Cancel button to close the dialog */}
+              <button
+                onClick={() => setShowResetDialog(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm"
+                disabled={resetLoading}
+              >
+                Cancel
+              </button>
+              {/* Button to send the reset email */}
+              <button
+                onClick={handleSendResetEmail}
+                disabled={resetLoading || !resetEmail}
+                className={`px-4 py-2 rounded text-sm font-medium ${
+                  resetLoading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 text-black"
+                }`}
+              >
+                {resetLoading ? "Sending..." : "Send Reset Email"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    
   );
 };
 
