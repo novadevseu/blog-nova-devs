@@ -10,6 +10,7 @@ import NameContainer from "./NameContainer";
 import UsernameContainer from "./UsernameContainer";
 import AdminContainer from "./AdminContainer";
 import ProfilePictureContainer from "./ProfilePictureContainer";
+import EmailContainer from "./EmailContainer";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -44,6 +45,8 @@ const Profile: React.FC = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
+    email: "",
+    subscribe: false,
   });
 
   // fetch the user details to the form data
@@ -51,7 +54,9 @@ const Profile: React.FC = () => {
     if (currentUser) {
       setFormData({
         fullName: currentUser.fullName,
-        username: currentUser.username,
+        username: currentUser.username, 
+        email: currentUser.email,
+        subscribe: currentUser.subscribed,
       });
     }
   }, [currentUser]);
@@ -122,7 +127,7 @@ const Profile: React.FC = () => {
             className="text-center mb-6 p-4 bg-[#090d1f] rounded-lg border border-gray-800/50"
           >
             <p className="text-gray-300">
-              <span className="font-medium">Email:</span> {currentUser.email}
+              <span className="font-medium">Username:</span> {currentUser.username}
             </p>
           </motion.div>
 
@@ -176,6 +181,7 @@ const Profile: React.FC = () => {
             </motion.div>
 
             <UsernameContainer {...{ formData, setFormData }} />
+            <EmailContainer {...{ formData, setFormData }} />
             
             <AnimatePresence>
               {currentUser.role === "Admin" && <AdminContainer />}

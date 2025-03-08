@@ -1,8 +1,7 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "@/config/firebase-config";
 import { Post } from "@/types/PostType";
 import { motion } from "framer-motion";
@@ -13,6 +12,8 @@ const Archive: React.FC = () => {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  // Estado para almacenar el mapping: uid -> username
+  const [usernameMapping, setUsernameMapping] = useState<Record<string, string>>({});
 
   // Extraer categorías únicas de los posts
   const categories = posts.reduce((acc: string[], post) => {
@@ -46,13 +47,48 @@ const Archive: React.FC = () => {
     fetchAllPosts();
   }, []);
 
-    // Filtrar posts basado en búsqueda y categoría
-    const filteredPosts = posts.filter(post => {
-      const matchesSearch = (post.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           post.author?.toLowerCase().includes(searchTerm.toLowerCase())) ?? false;
-      const matchesCategory = selectedCategory === "all" || post.categories?.includes(selectedCategory);
-      return matchesSearch && matchesCategory;
-    });
+  // Consultar Firestore para obtener los username de los autores que no tengamos en el mapping
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      const uidsToFetch: Set<string> = new Set();
+      posts.forEach((post) => {
+        if (post.author && !usernameMapping[post.author]) {
+          uidsToFetch.add(post.author);
+        }
+      });
+
+      if (uidsToFetch.size > 0) {
+        const newMapping: Record<string, string> = {};
+        for (const uid of Array.from(uidsToFetch)) {
+          try {
+            const userDocRef = doc(db, "users", uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+              const userData = userDocSnap.data();
+              newMapping[uid] = userData.username || "Unknown";
+            } else {
+              newMapping[uid] = "Unknown";
+            }
+          } catch (error) {
+            console.error("Error fetching username for uid:", uid, error);
+            newMapping[uid] = "Unknown";
+          }
+        }
+        setUsernameMapping((prev) => ({ ...prev, ...newMapping }));
+      }
+    };
+
+    fetchUsernames();
+  }, [posts, usernameMapping]);
+
+  // Filtrar posts basado en búsqueda y categoría
+  const filteredPosts = posts.filter((post) => {
+    const matchesSearch =
+      (post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.author?.toLowerCase().includes(searchTerm.toLowerCase())) ?? false;
+    const matchesCategory = selectedCategory === "all" || post.categories?.includes(selectedCategory);
+    return matchesSearch && matchesCategory;
+  });
 
   if (loading) {
     return (
@@ -112,7 +148,7 @@ const Archive: React.FC = () => {
               transition-all duration-300"
           >
             <option value="all">Todas las categorías</option>
-            {categories.map(category => (
+            {categories.map((category) => (
               <option key={category} value={category}>{category}</option>
             ))}
           </select>
@@ -140,13 +176,13 @@ const Archive: React.FC = () => {
                   <div className="flex flex-wrap gap-4 text-sm text-gray-400">
                     <span className="flex items-center gap-2">
                       <span className="w-2 h-2 bg-[#E0C600] rounded-full"></span>
-                      {post.author}
+                      {usernameMapping[post.author] || post.author}
                     </span>
                     <span className="flex items-center gap-2">
                       <span className="w-2 h-2 bg-[#E0C600] rounded-full"></span>
                       {new Date((post.timestamp?.seconds ?? 0) * 1000).toLocaleDateString()}
                     </span>
-                    {post.categories?.map(category => (
+                    {post.categories?.map((category) => (
                       <span key={category} className="px-2 py-1 bg-[#E0C600]/10 rounded-full text-[#E0C600] text-xs">
                         {category}
                       </span>

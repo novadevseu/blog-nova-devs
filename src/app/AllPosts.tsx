@@ -1,10 +1,12 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import { motion } from "framer-motion";
 import 'react-loading-skeleton/dist/skeleton.css';
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../config/firebase-config";
 
 interface Post {
   id: string;
@@ -14,7 +16,7 @@ interface Post {
   timestamp: { seconds: number; nanoseconds: number };
   thumbnailUrl: string;
   categories: string[];
-  author: string;
+  author: string; // Este campo contiene el uid del autor
 }
 
 interface PostListProps {
@@ -34,6 +36,42 @@ const getValidImageUrl = (url: string | undefined) => {
 };
 
 const AllPosts: React.FC<PostListProps> = ({ posts, loading }) => {
+  // Estado para almacenar el mapping: uid -> username
+  const [usernameMapping, setUsernameMapping] = useState<Record<string, string>>({});
+
+  // Cuando los posts cambien, obtenemos de Firestore los username de aquellos uids que aún no tenemos
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      const uidsToFetch: Set<string> = new Set();
+      posts.forEach((post) => {
+        if (post.author && !usernameMapping[post.author]) {
+          uidsToFetch.add(post.author);
+        }
+      });
+      if (uidsToFetch.size > 0) {
+        const newMapping: Record<string, string> = {};
+        for (const uid of Array.from(uidsToFetch)) {
+          try {
+            const userDocRef = doc(db, "users", uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+              const userData = userDocSnap.data();
+              newMapping[uid] = userData.username || "Unknown";
+            } else {
+              newMapping[uid] = "Unknown";
+            }
+          } catch (error) {
+            console.error("Error fetching username for uid:", uid, error);
+            newMapping[uid] = "Unknown";
+          }
+        }
+        setUsernameMapping((prev) => ({ ...prev, ...newMapping }));
+      }
+    };
+
+    fetchUsernames();
+  }, [posts, usernameMapping]);
+
   if (loading && posts.length === 0) {
     return (
       <div className="grid gap-6">
@@ -108,7 +146,8 @@ const AllPosts: React.FC<PostListProps> = ({ posts, loading }) => {
                 </span>
                 <span className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-[#E0C600] rounded-full"></span>
-                  {post.author}
+                  {/* Se muestra el username si está disponible, sino se muestra el uid */}
+                  {usernameMapping[post.author] || post.author}
                 </span>
               </div>
 
@@ -152,4 +191,5 @@ const AllPosts: React.FC<PostListProps> = ({ posts, loading }) => {
     </div>
   );
 };
+
 export default AllPosts;

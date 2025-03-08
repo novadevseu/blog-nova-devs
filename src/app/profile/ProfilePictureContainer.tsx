@@ -48,7 +48,7 @@ export default function ProfilePictureContainer() {
     const dispatch = useDispatch();
 
     const handleSavePicture = async () => {
-        await editUserData(dispatch, { img: selectedImage });
+        await editUserData(dispatch, currentUser!.uid,{ img: selectedImage });
         setEdit(false);
     };
 

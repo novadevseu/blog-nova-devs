@@ -1,6 +1,6 @@
 export interface Comment {
   id: string;
-  email: string;
+  userUid: string;
   content: string;
   timestamp: { seconds: number; nanoseconds: number };
   parentCommentId : string | null;

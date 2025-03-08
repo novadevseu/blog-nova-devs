@@ -25,7 +25,7 @@ const UpdatePostPage: React.FC = () => {
   const id = Array.isArray(params.id) ? params.id[0] : params.id; // Ensure id is a string
   const router = useRouter();
 
-  const [user, setUser] = useState<null | { email: string; role: string }>(null);
+  const [user, setUser] = useState<null | { userUid: string ; role: string }>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [post, setPost] = useState<Post | null>(null);
   const [title, setTitle] = useState("");
@@ -47,7 +47,7 @@ const UpdatePostPage: React.FC = () => {
             const userData = userDoc.data();
             if (userData.role === "Admin") {
               setUser({
-                email: userData.email as string,
+                userUid:userData.uid as string,
                 role: userData.role as string,
               });
             } else {

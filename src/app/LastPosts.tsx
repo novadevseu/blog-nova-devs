@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Carousel } from "react-responsive-carousel";
@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import Skeleton from "react-loading-skeleton";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import "react-loading-skeleton/dist/skeleton.css";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../config/firebase-config";
 
 interface Post {
   id: string;
@@ -17,7 +19,7 @@ interface Post {
   timestamp: { seconds: number; nanoseconds: number };
   thumbnailUrl: string;
   categories: string[];
-  author: string;
+  author: string; // Contiene el uid del autor
 }
 
 interface LastPostsProps {
@@ -25,6 +27,7 @@ interface LastPostsProps {
   loading: boolean;
 }
 
+// Función para validar la URL de la imagen
 const getValidImageUrl = (url: string | undefined) => {
   const placeholder =
     "https://placehold.co/600x400/090d1f/E0C600/png?text=CoffeeScript";
@@ -40,6 +43,45 @@ const getValidImageUrl = (url: string | undefined) => {
 };
 
 const LastPosts: React.FC<LastPostsProps> = ({ posts, loading }) => {
+  // Estado para almacenar el mapping de uid -> username
+  const [usernameMapping, setUsernameMapping] = useState<Record<string, string>>(
+    {}
+  );
+
+  // Cuando cambien los posts, se consulta Firestore para obtener los username que falten
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      const uidsToFetch: Set<string> = new Set();
+      posts.forEach((post) => {
+        if (post.author && !usernameMapping[post.author]) {
+          uidsToFetch.add(post.author);
+        }
+      });
+
+      if (uidsToFetch.size > 0) {
+        const newMapping: Record<string, string> = {};
+        for (const uid of Array.from(uidsToFetch)) {
+          try {
+            const userDocRef = doc(db, "users", uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+              const userData = userDocSnap.data();
+              newMapping[uid] = userData.username || "Unknown";
+            } else {
+              newMapping[uid] = "Unknown";
+            }
+          } catch (error) {
+            console.error("Error fetching username for uid:", uid, error);
+            newMapping[uid] = "Unknown";
+          }
+        }
+        setUsernameMapping((prev) => ({ ...prev, ...newMapping }));
+      }
+    };
+
+    fetchUsernames();
+  }, [posts, usernameMapping]);
+
   if (loading && posts.length === 0) {
     return (
       <section className="last-posts py-8">
@@ -138,13 +180,12 @@ const LastPosts: React.FC<LastPostsProps> = ({ posts, loading }) => {
                       <div className="flex items-center gap-4 text-sm text-gray-300">
                         <span className="flex items-center gap-2">
                           <span className="w-2 h-2 bg-[#E0C600] rounded-full" />
-                          {new Date(
-                            post.timestamp.seconds * 1000
-                          ).toLocaleDateString()}
+                          {new Date(post.timestamp.seconds * 1000).toLocaleDateString()}
                         </span>
                         <span className="flex items-center gap-2">
                           <span className="w-2 h-2 bg-[#E0C600] rounded-full" />
-                          {post.author}
+                          {/* Mostrar el username si está en el mapping, sino el uid */}
+                          {usernameMapping[post.author] || post.author}
                         </span>
                       </div>
 

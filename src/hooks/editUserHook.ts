@@ -11,12 +11,12 @@ import {
 } from "@firebase/firestore";
 import { Dispatch } from "@reduxjs/toolkit";
 
+// Ahora la función recibe el userId como parámetro
 export const editUserData = async (
   dispatch: Dispatch,
+  userId: string,
   updateUserData: Partial<UserType>
 ) => {
-  const userId = localStorage.getItem("uid");
-
   if (!userId) {
     return null;
   }
@@ -28,7 +28,9 @@ export const editUserData = async (
     if (userDoc.exists()) {
       await updateDoc(userDocRef, updateUserData);
 
-      const newUserData = userDoc.data() as UserType;
+      // Para obtener los datos actualizados, se consulta de nuevo el documento
+      const updatedUserDoc = await getDoc(userDocRef);
+      const newUserData = updatedUserDoc.data() as UserType;
 
       const emailData = updateUserData.email;
 
@@ -56,6 +58,7 @@ export const editUserData = async (
           fullName: newUserData.fullName || "",
           img: newUserData.img || "",
           profile: newUserData.profile || "",
+          subscribed: newUserData.subscribed,
         })
       );
     } else {

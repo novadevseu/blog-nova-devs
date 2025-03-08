@@ -12,6 +12,7 @@ export interface UserType {
   img: string;
   fullName: string;
   profile: string;
+  subscribed: boolean;
   jobDescription?: string;
   company?: string;
   education?: string;

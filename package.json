@@ -26,6 +26,7 @@
     "react-redux": "^9.2.0",
     "react-responsive-carousel": "^3.2.23",
     "remark-gfm": "^4.0.0",
+    "resend": "^4.1.2",
     "uuid": "^11.0.5"
   },
   "devDependencies": {

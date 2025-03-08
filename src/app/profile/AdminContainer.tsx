@@ -53,7 +53,7 @@ function AdminContainer() {
 
   const handleSaveAdminValues = async () => {
     if (currentUser && currentUser.role === "Admin")
-      await editUserData(dispatch, { ...adminFormData });
+      await editUserData(dispatch, currentUser.uid,{ ...adminFormData });
   };
 
   if (currentUser)

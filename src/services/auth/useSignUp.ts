@@ -31,7 +31,7 @@ export const useSignUp = async ({
     // Crea un nuevo usuario con email y contraseña
     const user = await signUpWithEmail(email, password);
     // Crea (o obtiene) el documento del usuario en Firestore
-    const userData = await getOrCreateUserDocument({ uid: user.uid, email: user.email });
+    const userData = await getOrCreateUserDocument({ uid: user.uid });
     // Actualiza Redux
     dispatch(setUser(userData));
     

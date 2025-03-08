@@ -13,7 +13,8 @@ interface UsernameContainerInterface {
     };
     setFormData: React.Dispatch<React.SetStateAction<{
         username: string,
-        fullName: string
+        fullName: string, email: string;
+        subscribe: boolean;
     }>>;
 }
 
@@ -34,7 +35,7 @@ function UsernameContainer({formData, setFormData}: UsernameContainerInterface) 
     const dispatch = useDispatch();
 
     const handleEditUsername = async () => {
-        await editUserData(dispatch, {username: formData.username});
+        await editUserData(dispatch,currentUser!.uid, {username: formData.username});
     }
 
     if(currentUser)

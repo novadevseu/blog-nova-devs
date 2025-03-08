@@ -13,7 +13,8 @@ interface NameContainerInterface {
     };
     setFormData: React.Dispatch<React.SetStateAction<{
         username: string,
-        fullName: string
+        fullName: string, email: string;
+        subscribe: boolean;
     }>>;
 }
 
@@ -35,7 +36,8 @@ interface NameContainerInterface {
     };
     setFormData : React.Dispatch<React.SetStateAction<{
         username : string,
-        fullName : string
+        fullName : string, email: string;
+        subscribe: boolean;
     }>>;
 }
 
@@ -45,7 +47,8 @@ function NameContainer({formData, setFormData}: NameContainerInterface) {
   const dispatch = useDispatch();
 
   const handleEditFullName = async () => {
-      await editUserData(dispatch, {fullName: formData.fullName});
+    console.log("formData", formData);
+      await editUserData(dispatch, currentUser!.uid,{fullName: formData.fullName});
   };
 
   if(currentUser)

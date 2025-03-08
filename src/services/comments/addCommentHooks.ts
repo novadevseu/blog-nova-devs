@@ -4,22 +4,22 @@ import { addDoc, collection } from "@firebase/firestore";
 interface HandleAddComment {
     newComment : string | null,
     id : string,
-    userEmail : string | null,
+    userUid: string | null;
     selectedCommentId : string | null,
     setNewComment : React.Dispatch<React.SetStateAction<string>>
     e : React.FormEvent
 }
 
-export const addCommentHook = async ({e,id,newComment,setNewComment,userEmail,selectedCommentId} : HandleAddComment) => {
+export const addCommentHook = async ({e,id,newComment,setNewComment,userUid,selectedCommentId} : HandleAddComment) => {
     e.preventDefault();
-    if (!newComment || !id || !userEmail) return;
+    if (!newComment || !id || !userUid) return;
 
     console.log('helo')
 
     try {
       await addDoc(collection(db, "comments"), {
         postId: id,
-        email: userEmail,
+        userUid: userUid,
         content: newComment,
         parentCommentId : selectedCommentId,
         timestamp: new Date(),
